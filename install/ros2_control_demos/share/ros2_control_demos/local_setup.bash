@@ -1,0 +1,1 @@
+/home/zerodaytea/research/ros2-control-vuln-seeding/build/ros2_control_demos/ament_cmake_environment_hooks/local_setup.bash
