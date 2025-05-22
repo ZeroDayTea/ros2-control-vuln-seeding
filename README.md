@@ -10,16 +10,20 @@ Must be on Ubuntu 22.04 or higher for this to work. Has only been tested on Ubun
 ./build.sh
 ```
 
+## Running ROS2 In A Workspace
+```
+source ./source_workspace.sh
+\[any 'ros2' commands\]
+```
+
 ## Running the Controller
 
 ```
-./source_workspace.sh
 ./controller.sh
 ```
 
 ## Sending the Trajectory
 
 ```
-./source_workspace.sh
 ./send_trajectory.sh
 ```
