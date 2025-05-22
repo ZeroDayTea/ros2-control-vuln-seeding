@@ -7,7 +7,7 @@ rosdep update
 rosdep install --from-paths src --ignore-src -r -y --rosdistro jazzy
 
 echo "Building Project"
-colcon build --symlink-install
+colcon build --symlink-install --cmake-clean-cache
 
 echo ""
 echo "Build Complete"
