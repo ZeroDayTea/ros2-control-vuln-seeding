@@ -1,3 +1,5 @@
+#!/bin/bash
+
 source /opt/ros/jazzy/setup.bash
 
 echo "Installing Project Dependencies"

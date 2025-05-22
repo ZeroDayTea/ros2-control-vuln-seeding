@@ -1,1 +1,0 @@
-/home/zerodaytea/research/ros2-control-vuln-seeding/src/example_7/description/launch/view_r6bot.launch.py

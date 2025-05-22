@@ -1,6 +1,7 @@
 #! /bin/bash
 
-dir="/isis/home/cailm/ros2_ws/src/ros2_control_demos/example_7/controller"
+dir="/home/zerodaytea/src/ros2_control_demos/example_7/controller"
+out_dir="/home/zerodaytea/research/ros2-control-vuln-seeding/"
 
 # $dir/c0/build_controller.sh $dir
 

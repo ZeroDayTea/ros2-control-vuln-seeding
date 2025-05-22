@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if ! grep -q "Ubuntu" /etc/os-release 2>/dev/null; then
 	echo "This script only works for Ubuntu"
 	exit 1
@@ -38,3 +40,6 @@ sudo apt install -y \
 
 sudo rosdep init
 source /opt/ros/jazzy/setup.bash
+
+echo "Finished installing ROS2 Jazzy"
+
