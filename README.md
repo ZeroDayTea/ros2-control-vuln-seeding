@@ -22,6 +22,7 @@ source ./source_workspace.sh
 [In one workspace]
 ./controller.sh
 [In a separate workspace]
+./send_trajectory.sh
 ```
 
 ## Program repair with voter
