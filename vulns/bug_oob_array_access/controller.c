@@ -41,7 +41,6 @@ void interpolate_point(
     //double total_time = last_time.sec + last_time.nanosec * 1E-9;
   
     size_t ind = cur_time_seconds * (traj_len / total_time);
-    ind = MIN( (double) ind, traj_len - 2);
     double delta = cur_time_seconds - ind * (total_time / traj_len);
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
   }
