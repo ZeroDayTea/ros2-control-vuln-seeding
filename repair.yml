@@ -38,16 +38,16 @@ coverage:
 
 localization:
   type: spectrum
-  metric: jaccard
+  metric: tarantula
 
 algorithm:
-  type: exhaustive
-  # population: 80
-  # generations: 20
-  # tournament-size: 3
-  # mutation-rate: 0.6
-  # crossover-rate: 0.1
-  # test-sample-size: 0.4
+  type: genetic
+  population: 80
+  generations: 20
+  tournament-size: 3
+  mutation-rate: 0.6
+  crossover-rate: 0.1
+  test-sample-size: 0.4
 
 transformations:
   schemas:
