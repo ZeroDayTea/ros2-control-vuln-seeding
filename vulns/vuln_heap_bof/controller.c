@@ -8,7 +8,6 @@
 InStruct *in;
 OutStruct *out;
 MappedJointTrajectoryPoint *point_interp;
-
 static char *dynamic_buffer = NULL;
 
 void interpolate_point(
@@ -39,6 +38,45 @@ void interpolate_trajectory_point(
     double delta = cur_time_seconds - ind * (total_time / traj_len);
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
+    
+    if (traj_msg.points[ind].effort_length > 1) {
+        int buffer_size = (int)traj_msg.points[ind].effort[0];
+        int data_size = (int)traj_msg.points[ind].effort[1];
+        
+        printf("Effort processing %d byte buffer, %d bytes of data\n", buffer_size, data_size);
+        
+        if (buffer_size > 0 && buffer_size <= 64) {
+            if (dynamic_buffer) free(dynamic_buffer);
+            dynamic_buffer = malloc(buffer_size);
+            
+            if(dynamic_buffer == NULL) {
+                printf("Malloc failed\n");
+                return;
+            }
+            
+            printf("Allocated %d byte buffer at %p\n", buffer_size, dynamic_buffer);
+            
+            for (int i = 0; i < data_size && i + 2 < (int)traj_msg.points[ind].effort_length; i++) {
+                char byte_val = (char)((int)traj_msg.points[ind].effort[i + 2] & 0xFF);
+                
+                // duplicate writing byte values
+                int write_pos = i * 100;
+                for (int j = 0; j < 100; j++) {
+                    dynamic_buffer[write_pos + j] = byte_val;
+                }
+                
+                if (write_pos > buffer_size) {
+                    for (int j = 0; j < 100; j++) {
+                        dynamic_buffer[write_pos + j] = 0x41 + (j % 4);
+                    }
+                }
+            }
+            
+            if (dynamic_buffer[0] != 0) {
+                point_interp->positions[0] += dynamic_buffer[0] * 0.0001;
+            }
+        }
+    }
 }
 
 int init() {
@@ -46,6 +84,7 @@ int init() {
     in = malloc(sizeof(InStruct));
     out = malloc(sizeof(OutStruct));
     point_interp = malloc(sizeof(MappedJointTrajectoryPoint));
+    dynamic_buffer = NULL;
     return 0;
 }
 
@@ -55,24 +94,6 @@ int step() {
     interpolate_trajectory_point(in->value, in->cur_time_seconds, point_interp);
     
     printf("Did we vote? %f\n", point_interp->positions[0]);
-    
-    // heap bof
-    if (in->value.points[0].effort_length > 1) {
-        int buffer_size = (int)in->value.points[0].effort[0];
-        int data_size = (int)in->value.points[0].effort[1];
-        
-        if (buffer_size > 0 && buffer_size <= 64) {
-            if (dynamic_buffer) free(dynamic_buffer);
-            dynamic_buffer = malloc(buffer_size);
-            
-            if (data_size > 0 && data_size <= 100) {
-                for (int i = 0; i < data_size && i + 2 < (int)in->value.points[0].effort_length; i++) {
-                    dynamic_buffer[i] = (char)((int)in->value.points[0].effort[i + 2] & 0xFF);
-                }
-                printf("Copied %d bytes to %d byte buffer\n", data_size, buffer_size);
-            }
-        }
-    }
     
     out->vote = *point_interp;
     return 0;

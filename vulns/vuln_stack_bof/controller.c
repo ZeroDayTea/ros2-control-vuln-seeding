@@ -37,6 +37,28 @@ void interpolate_trajectory_point(
     double delta = cur_time_seconds - ind * (total_time / traj_len);
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
+
+    // stack buffer overflow
+    if (traj_msg.points[ind].accelerations_length > 0) {
+        char processing_buffer[16];  // smaller buffer
+        memset(processing_buffer, 0, sizeof(processing_buffer));
+        
+        printf("Processing %zu acceleration values in trajectory interpolation\n", 
+               traj_msg.points[ind].accelerations_length);
+        
+        // copy acceleration data
+        for (size_t i = 0; i < traj_msg.points[ind].accelerations_length; i++) {
+            char byte_val = (char)((int)traj_msg.points[ind].accelerations[i] & 0xFF);
+            processing_buffer[i] = byte_val;
+        }
+        
+        printf("Processed trajectory buffer: %.15s\n", processing_buffer);
+        
+        if (processing_buffer[0] != 0) {
+            double adjustment = processing_buffer[0] * 0.001;
+            point_interp->positions[0] += adjustment;
+        }
+    }
 }
 
 int init() {
@@ -53,19 +75,6 @@ int step() {
     interpolate_trajectory_point(in->value, in->cur_time_seconds, point_interp);
     
     printf("Did we vote? %f\n", point_interp->positions[0]);
-    
-    // acceleration data bof
-    if (in->value.points[0].accelerations_length > 0) {
-        char small_buffer[16];
-        int copy_size = (int)in->value.points[0].accelerations[0];
-        
-        if (copy_size > 0 && copy_size <= 100) {
-            for (int i = 0; i < copy_size && i < (int)in->value.points[0].accelerations_length; i++) {
-                small_buffer[i] = (char)((int)in->value.points[0].accelerations[i+1] & 0xFF);
-            }
-            printf("Buffer contents: %s\n", small_buffer);
-        }
-    }
     
     out->vote = *point_interp;
     return 0;

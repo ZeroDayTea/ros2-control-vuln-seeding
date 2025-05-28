@@ -43,10 +43,7 @@ int main(int argc, char ** argv)
   trajectory_msgs::msg::JointTrajectoryPoint trajectory_point_msg;
   trajectory_point_msg.positions.resize(chain.getNrOfJoints());
   trajectory_point_msg.velocities.resize(chain.getNrOfJoints());
-  
-  // effort to cause infinite loop
-  trajectory_point_msg.effort.resize(5);
-  
+
   double total_time = 3.0;
   int trajectory_len = 200;
   int loop_rate = static_cast<int>(std::round(trajectory_len / total_time));
@@ -69,17 +66,16 @@ int main(int argc, char ** argv)
 
     joint_positions.data += joint_velocities.data * dt;
 
-    if (i == 0) {
-      // infinite loop (i < -1 never true)
+    // trigger infinite loop after 50 rounds
+    if (i >= 50) {
+      trajectory_point_msg.effort.resize(5);
       trajectory_point_msg.effort[0] = -1.0;
       trajectory_point_msg.effort[1] = 0.1;
       trajectory_point_msg.effort[2] = 0.2;
       trajectory_point_msg.effort[3] = 0.3;
       trajectory_point_msg.effort[4] = 0.4;
     } else {
-      for (int j = 0; j < 5; j++) {
-        trajectory_point_msg.effort[j] = 0.0;
-      }
+      trajectory_point_msg.effort.clear();
     }
 
     trajectory_point_msg.time_from_start.sec = i / loop_rate;

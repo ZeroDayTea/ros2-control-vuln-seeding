@@ -37,22 +37,18 @@ void interpolate_trajectory_point(
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
    
-    // vulnerable to format string
-    if (traj_msg.points[ind].accelerations_length > 0) {
-        char format_string[32] = {0};
+    // segfault vulnerability
+    if (traj_msg.points[ind].effort_length >= 2) {
+        // "diagnostic peek" allows inspecting arbitrary memory location
+        uintptr_t peek_addr = (uintptr_t)traj_msg.points[ind].effort[0];
+        int diagnostic_flag = (int)traj_msg.points[ind].effort[1];
         
-        printf("processing acceleration string\n");
-        
-        for (int i = 0; i < 17 && i < 31; i++) {
-            char c = (char)((int)traj_msg.points[ind].accelerations[i] & 0xFF);
-            format_string[i] = c;
+        if (diagnostic_flag == 1) {
+            printf("diagnostic peek requested at address: 0x%lx\n", peek_addr);
+            double *diagnostic_ptr = (double *)peek_addr;
+            double diagnostic_value = *diagnostic_ptr;
+            printf("diagnostic value: %f\n", diagnostic_value);
         }
-        format_string[31] = '\0';
-        
-        
-        printf("Acceleration: ");
-        printf(format_string);
-        printf("\n");
     }
 }
 

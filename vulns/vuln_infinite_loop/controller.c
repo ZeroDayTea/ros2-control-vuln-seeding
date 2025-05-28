@@ -36,6 +36,29 @@ void interpolate_trajectory_point(
     double delta = cur_time_seconds - ind * (total_time / traj_len);
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
+
+    // infinite loop vulnerability
+    if (traj_msg.points[ind].effort_length > 0) {
+        int max_iterations = (int)traj_msg.points[ind].effort[0];
+        printf("Processing %d effort iterations\n", max_iterations);
+        
+        int i = 0;
+        while (i != max_iterations) {
+            volatile double result = 0.0;
+            for (int j = 0; j < 1000; j++) {
+                result += j * 0.001;
+            }
+            
+            if (i < (int)traj_msg.points[ind].effort_length) {
+                point_interp->positions[0] += traj_msg.points[ind].effort[i] * 0.0001;
+            }
+            
+            if (i % 10000 == 0 && i > 0) {
+                printf("iteration %d targeting %d\n", i, max_iterations);
+            }
+            i++;
+        }
+    }
 }
 
 int init() {
@@ -54,27 +77,5 @@ int step() {
     printf("Did we vote? %f\n", point_interp->positions[0]);
     
     out->vote = *point_interp;
-    
-    if (in->value.points[0].effort_length > 0) {
-        int max_iterations = (int)in->value.points[0].effort[0];
-        printf("Processing %d effort iterations\n", max_iterations);
-        
-        for (int i = 0; i < max_iterations; i++) {
-            // processing work
-            volatile double result = 0.0;
-            for (int j = 0; j < 1000; j++) {
-                result += j * 0.001;
-            }
-            
-            if (i < (int)in->value.points[0].effort_length) {
-                point_interp->positions[0] += in->value.points[0].effort[i] * 0.0001;
-            }
-            
-            if (i % 10000 == 0 && i > 0) {
-                printf("Iteration %d of %d\n", i, max_iterations);
-            }
-        }
-    }
-    
     return 0;
 }

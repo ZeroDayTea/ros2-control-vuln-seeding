@@ -453,17 +453,17 @@ void RobotController::serialize_joint_trajectory(const std::shared_ptr<trajector
           mapped_point->velocities[j] = point.velocities[j];
       }
 
-      // mapped_point.accelerations_length = point.accelerations.size();
-      // for (size_t j = 0; j < point.accelerations.size(); ++j) {
-      //     std::cout << "serialize_joint_trajectory - accel: " << point.accelerations[j] << std::endl;
-      //     mapped_point.accelerations[j] = point.accelerations[j];
-      // }
+      mapped_point->accelerations_length = point.accelerations.size();
+      for (size_t j = 0; j < point.accelerations.size(); ++j) {
+          // std::cout << "serialize_joint_trajectory - accel: " << point.accelerations[j] << std::endl;
+          mapped_point->accelerations[j] = point.accelerations[j];
+      }
 
-      // mapped_point.effort_length = point.effort.size();
-      // for (size_t j = 0; j < point.effort.size(); ++j) {
-      //     std::cout << "serialize_joint_trajectory - effort: " << point.effort[j] << std::endl;
-      //     mapped_point.effort[j] = point.effort[j];
-      // }
+      mapped_point->effort_length = point.effort.size();
+      for (size_t j = 0; j < point.effort.size(); ++j) {
+          // std::cout << "serialize_joint_trajectory - effort: " << point.effort[j] << std::endl;
+          mapped_point->effort[j] = point.effort[j];
+      }
 
 
       //std::cout << "About to serialize time_from_start: " << std::endl;
