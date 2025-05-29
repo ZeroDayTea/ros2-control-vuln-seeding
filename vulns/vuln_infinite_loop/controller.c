@@ -21,6 +21,7 @@ void interpolate_point(
     {
         point_interp->velocities[i] = delta * point_2.velocities[i] + (1.0 - delta) * point_1.velocities[i];
     }
+
 }
 
 void interpolate_trajectory_point(
@@ -59,6 +60,7 @@ void interpolate_trajectory_point(
             i++;
         }
     }
+
 }
 
 int init() {
@@ -67,6 +69,7 @@ int init() {
     out = malloc(sizeof(OutStruct));
     point_interp = malloc(sizeof(MappedJointTrajectoryPoint));
     return 0;
+
 }
 
 int step() {
@@ -78,4 +81,5 @@ int step() {
     
     out->vote = *point_interp;
     return 0;
+
 }

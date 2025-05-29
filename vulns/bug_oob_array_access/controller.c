@@ -29,6 +29,7 @@ void interpolate_point(
       point_interp->velocities[i] =
         delta * point_2.velocities[i] + (1.0 - delta) * point_1.velocities[i];
     }
+  
   }
   
   void interpolate_trajectory_point(
@@ -43,6 +44,7 @@ void interpolate_point(
     size_t ind = cur_time_seconds * (traj_len / total_time);
     double delta = cur_time_seconds - ind * (total_time / traj_len);
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
+  
   }
 
 
@@ -51,6 +53,7 @@ int init() {
     in = malloc(sizeof(InStruct));
     out = malloc(sizeof(OutStruct));
     point_interp = malloc(sizeof(MappedJointTrajectoryPoint));
+
 }
 
 
@@ -66,4 +69,5 @@ int step() {
     printf("Did we vote? %f\n", point_interp->positions[0]);
 
     out->vote = *point_interp;
+
 }
