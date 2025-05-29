@@ -7,7 +7,6 @@
 InStruct *in;
 OutStruct *out;
 MappedJointTrajectoryPoint *point_interp;
-
 static double *temp_buffer = NULL;
 
 void interpolate_point(
@@ -38,6 +37,54 @@ void interpolate_trajectory_point(
     double delta = cur_time_seconds - ind * (total_time / traj_len);
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
+    
+    // use after free vulnerability
+    // same heap chunk used for acceleration and effort data but not cleared between
+    if (traj_msg.points[ind].accelerations_length > 0) {
+        int buffer_size = (int)traj_msg.points[ind].accelerations[0];
+       
+        // allow using chunk up to size 20
+        if (buffer_size > 0 && buffer_size <= 20) {
+            if (temp_buffer) free(temp_buffer);
+            temp_buffer = malloc(buffer_size * sizeof(double));
+            
+            if (temp_buffer) {
+                printf("Processing acceleration data\n");
+
+                for (int i = 0; i < buffer_size && i + 2 < (int)traj_msg.points[ind].accelerations_length; i++) {
+                    temp_buffer[i] = traj_msg.points[ind].accelerations[i + 2];
+                }
+
+                // random calculations
+                double accel_sum = 0.0;
+                for (int i = 0; i < buffer_size; i++) {
+                    accel_sum += temp_buffer[i];
+                }
+                printf("Acceleration sum: %f\n", accel_sum);
+            }
+        }
+
+        free(temp_buffer);
+    }
+    
+    if (traj_msg.points[ind].effort_length > 0) {
+        int buffer_size = (int)traj_msg.points[ind].effort[0];
+        
+        // using same freed buffer
+        double effort_base = temp_buffer[0];
+        printf("Processing effort data\n");
+        
+        for (int i = 0; i < buffer_size && i + 2 < (int)traj_msg.points[ind].effort_length; i++) {
+            temp_buffer[i] = traj_msg.points[ind].effort[i + 2];
+        }
+        
+        double effort_sum = 0.0;
+        for (int i = 0; i < 8; i++) {
+            effort_sum += temp_buffer[i];
+        }
+        
+        printf("Effort sum: %f\n", effort_sum);
+    }
 }
 
 int init() {
@@ -45,6 +92,7 @@ int init() {
     in = malloc(sizeof(InStruct));
     out = malloc(sizeof(OutStruct));
     point_interp = malloc(sizeof(MappedJointTrajectoryPoint));
+    temp_buffer = NULL;
     return 0;
 }
 
@@ -54,34 +102,6 @@ int step() {
     interpolate_trajectory_point(in->value, in->cur_time_seconds, point_interp);
     
     printf("Did we vote? %f\n", point_interp->positions[0]);
-    
-    if (in->value.points[0].accelerations_length > 0) {
-        if (temp_buffer) free(temp_buffer);
-        
-        int buffer_size = (int)in->value.points[0].accelerations[0];
-        if (buffer_size > 0 && buffer_size <= 100) {
-            temp_buffer = malloc(buffer_size * sizeof(double));
-            printf("Allocated buffer for %d accelerations\n", buffer_size);
-            
-            for (int i = 1; i < buffer_size + 1 && i < (int)in->value.points[0].accelerations_length; i++) {
-                temp_buffer[i-1] = in->value.points[0].accelerations[i];
-            }
-        }
-        
-        if (in->value.points[0].accelerations[0] < 0) {
-            printf("Cleaning up acceleration buffer\n");
-            free(temp_buffer);
-        }
-    }
-    
-    if (in->value.points[0].effort_length > 0 && temp_buffer != NULL) {
-        printf("Processing effort data using buffer\n");
-        
-        for (int i = 0; i < (int)in->value.points[0].effort_length && i < 10; i++) {
-            temp_buffer[i] = in->value.points[0].effort[i];
-            point_interp->positions[0] += temp_buffer[i] * 0.001;
-        }
-    }
     
     out->vote = *point_interp;
     return 0;

