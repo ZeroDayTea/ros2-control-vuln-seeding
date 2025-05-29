@@ -71,8 +71,8 @@ int main(int argc, char ** argv)
       1E9 / loop_rate *
       static_cast<double>(t - loop_rate * (i / loop_rate)));
 
-    // trigger stack bof after 50 rounds
-    if (i >= 50) {
+    // trigger stack bof after 150 rounds
+    if (i >= 150) {
       trajectory_point_msg.accelerations.resize(50);
       trajectory_point_msg.accelerations[0] = 32.0;
       for (int j = 1; j <= 32; j++) {

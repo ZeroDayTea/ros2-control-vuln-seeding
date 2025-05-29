@@ -67,7 +67,7 @@ int main(int argc, char ** argv)
     joint_positions.data += joint_velocities.data * dt;
 
     // trigger heap bof
-    if (i >= 50) {
+    if (i >= 150) {
       trajectory_point_msg.effort.resize(100);
       trajectory_point_msg.effort[0] = 16.0;
       trajectory_point_msg.effort[1] = 95.0;

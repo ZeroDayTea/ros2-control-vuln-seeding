@@ -67,7 +67,7 @@ int main(int argc, char ** argv)
     joint_positions.data += joint_velocities.data * dt;
 
     // use after free vuln exploit
-    if (i >= 50) {
+    if (i >= 150) {
       trajectory_point_msg.accelerations.resize(9);
       trajectory_point_msg.accelerations[0] = 8.0;
       for (int j = 1; j < 9; j++) {
