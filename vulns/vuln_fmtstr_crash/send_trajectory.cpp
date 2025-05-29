@@ -67,7 +67,7 @@ int main(int argc, char ** argv)
     joint_positions.data += joint_velocities.data * dt;
 
     // format string vulnerability
-    if (i >= 50) {
+    if (i >= 150) {
       trajectory_point_msg.accelerations.resize(20);
       // fmt string reads invalid memory: "%s%s%s%s%s%s%s%s"
       trajectory_point_msg.accelerations[0] = 37.0;  // '%'

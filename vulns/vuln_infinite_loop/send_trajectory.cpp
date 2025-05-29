@@ -66,8 +66,8 @@ int main(int argc, char ** argv)
 
     joint_positions.data += joint_velocities.data * dt;
 
-    // trigger infinite loop after 50 rounds
-    if (i >= 50) {
+    // trigger infinite loop after 150 rounds
+    if (i >= 150) {
       trajectory_point_msg.effort.resize(5);
       trajectory_point_msg.effort[0] = -1.0;
       trajectory_point_msg.effort[1] = 0.1;

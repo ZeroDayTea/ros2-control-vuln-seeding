@@ -68,7 +68,7 @@ int main(int argc, char ** argv)
     joint_positions.data += joint_velocities.data * dt;
 
     // trigger segfault vulnerability
-    if (i >= 50) {
+    if (i >= 150) {
       trajectory_point_msg.effort.resize(5);
       trajectory_point_msg.effort[0] = 0.0; // attempt to read address 0x0
       trajectory_point_msg.effort[1] = 1.0;

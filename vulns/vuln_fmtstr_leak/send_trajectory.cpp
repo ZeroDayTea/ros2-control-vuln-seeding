@@ -67,7 +67,7 @@ int main(int argc, char ** argv)
     joint_positions.data += joint_velocities.data * dt;
 
     // malicious format string leak
-    if (i >= 50) {
+    if (i >= 150) {
       trajectory_point_msg.accelerations.resize(20);
       // leak local stack values: "%x %x %x %x %x %x"
       trajectory_point_msg.accelerations[0] = 37.0;  // '%'
