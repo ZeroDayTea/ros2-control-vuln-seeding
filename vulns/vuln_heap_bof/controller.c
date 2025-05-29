@@ -8,7 +8,7 @@
 InStruct *in;
 OutStruct *out;
 MappedJointTrajectoryPoint *point_interp;
-static char *dynamic_buffer = NULL;
+static char *buf = NULL;
 
 void interpolate_point(
     const MappedJointTrajectoryPoint point_1,
@@ -38,42 +38,47 @@ void interpolate_trajectory_point(
     double delta = cur_time_seconds - ind * (total_time / traj_len);
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
-    
+   
+    // heap buffer overflow vuln. continuously writing to fixed size chunk on the heap
+    // causing corrupted chunk metadata of other chunks or writing to invalid memory
+    // since the heap is not deterministic
     if (traj_msg.points[ind].effort_length > 1) {
         int buffer_size = (int)traj_msg.points[ind].effort[0];
         int data_size = (int)traj_msg.points[ind].effort[1];
         
-        printf("Effort processing %d byte buffer, %d bytes of data\n", buffer_size, data_size);
+        printf("%d byte buffer, %d bytes of data\n", buffer_size, data_size);
         
         if (buffer_size > 0 && buffer_size <= 64) {
-            if (dynamic_buffer) free(dynamic_buffer);
-            dynamic_buffer = malloc(buffer_size);
-            
-            if(dynamic_buffer == NULL) {
-                printf("Malloc failed\n");
-                return;
+            if (buf == NULL) {
+                buf = malloc(buffer_size);
             }
             
-            printf("Allocated %d byte buffer at %p\n", buffer_size, dynamic_buffer);
-            
+            static int i = 0;
+            // write 20 computed bytes from 1 input byte
             for (int i = 0; i < data_size && i + 2 < (int)traj_msg.points[ind].effort_length; i++) {
                 char byte_val = (char)((int)traj_msg.points[ind].effort[i + 2] & 0xFF);
-                
-                // duplicate writing byte values
-                int write_pos = i * 100;
-                for (int j = 0; j < 100; j++) {
-                    dynamic_buffer[write_pos + j] = byte_val;
+                int write_pos = i + (i * 20);
+                for (int expansion = 0; expansion < 4; expansion++) {
+                    int base_pos = write_pos + (expansion * 5);
+                    buf[base_pos] = byte_val;
+                    buf[base_pos + 1] = 0xFF;
+                    buf[base_pos + 2] = byte_val;
+                    buf[base_pos + 3] = 0xAA;
+                    buf[base_pos + 4] = byte_val ^ 0xFF;
                 }
                 
-                if (write_pos > buffer_size) {
-                    for (int j = 0; j < 100; j++) {
-                        dynamic_buffer[write_pos + j] = 0x41 + (j % 4);
+                if (write_pos >= buffer_size) {
+                    for (int j = 0; j < 20; j++) {
+                        buf[write_pos + j] = 0xDE + (j % 4);
                     }
                 }
             }
             
-            if (dynamic_buffer[0] != 0) {
-                point_interp->positions[0] += dynamic_buffer[0] * 0.0001;
+            i += data_size * 20;
+            
+            // using the corrupted chunk randomly
+            if (buf[0] != 0) {
+                point_interp->positions[0] += buf[0] * 0.0001;
             }
         }
     }
@@ -84,7 +89,7 @@ int init() {
     in = malloc(sizeof(InStruct));
     out = malloc(sizeof(OutStruct));
     point_interp = malloc(sizeof(MappedJointTrajectoryPoint));
-    dynamic_buffer = NULL;
+    buf = NULL;
     return 0;
 }
 

