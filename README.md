@@ -7,13 +7,14 @@ Automated program repair of vulnerabilities in a ROS2 Controller
 Must be on Ubuntu 22.04 or higher for this to work. Has only been tested on Ubuntu 24.04.
 ```
 ./install_ros2_jazzy.sh
+./copy_vuln.sh safe
 ./build.sh
 ```
 
 ## Running an example
 
 ```
-./copy_vuln.sh safe
+./copy_vuln.sh safe[name of vuln]
 colcon build --symlink-install --packages-select ros2_control_demo_example_7
 ./build_controllers.sh
 
