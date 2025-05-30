@@ -50,9 +50,11 @@ void interpolate_trajectory_point(
         }
         format_string[31] = '\0';
         
-        printf("Acceleration: ")
+        printf("Acceleration: ");
         printf(format_string);
+        
         printf("\n");
+
     }
 
 }

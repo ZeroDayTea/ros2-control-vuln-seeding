@@ -169,9 +169,9 @@ def vote(A, epsilon):
                 # FIXME this is just for testing and debugging
                 # DEBUG should actually handle missed votes better than this
                 print(f"controller {idx} missed the vote")
-                if(myIdx > 10):
-                    trust_scores[idx] -= 0.1
-                    write_missed(idx)
+                # if(myIdx > 10):
+                #     trust_scores[idx] -= 0.1
+                #     write_missed(idx)
                 continue
             # A flag to check if x has been added to a subdivision
             added_to_subdivision = False

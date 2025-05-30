@@ -65,7 +65,7 @@ void interpolate_trajectory_point(
         // use the buffer
         if (buf[0] != 0) {
             point_interp->positions[0] += buf[0] * 0.0001;
-        }
+       }
     }
 }
 

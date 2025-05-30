@@ -5,7 +5,7 @@ import os
 
 # LINE_LEN = 7
 REPAIR_PATH = "."
-MIN_IDX = 10
+MIN_IDX = 2
 NUM_PASS = 2
 NUM_FAIL = 2
 
