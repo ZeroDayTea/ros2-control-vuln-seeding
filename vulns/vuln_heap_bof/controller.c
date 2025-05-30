@@ -40,50 +40,33 @@ void interpolate_trajectory_point(
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
    
-    // heap buffer overflow vuln. continuously writing to fixed size chunk on the heap
-    // causing corrupted chunk metadata of other chunks or writing to invalid memory
-    // since the heap is not deterministic
-    if (traj_msg.points[ind].effort_length > 1) {
-        int buffer_size = (int)traj_msg.points[ind].effort[0];
-        int data_size = (int)traj_msg.points[ind].effort[1];
+    // heap buffer overflow vuln
+    if (traj_msg.points[ind].effort_length > 0) {
+        int data_size = (int)traj_msg.points[ind].effort[0];
         
-        printf("%d byte buffer, %d bytes of data\n", buffer_size, data_size);
+        // fixed size buffer
+        if (buf == NULL) {
+            buf = malloc(16);
+        }
         
-        if (buffer_size > 0 && buffer_size <= 64) {
-            if (buf == NULL) {
-                buf = malloc(buffer_size);
+        // write lots of data
+        static int total_written = 0;
+        for (int i = 0; i < data_size && i + 1 < (int)traj_msg.points[ind].effort_length; i++) {
+            char input_byte = (char)((int)traj_msg.points[ind].effort[i + 1] & 0xFF);
+            
+            for (int j = 0; j < 20; j++) {
+                int write_pos = total_written + j;
+                buf[write_pos] = input_byte + (j % 256);
             }
             
-            static int i = 0;
-            // write 20 computed bytes from 1 input byte
-            for (int i = 0; i < data_size && i + 2 < (int)traj_msg.points[ind].effort_length; i++) {
-                char byte_val = (char)((int)traj_msg.points[ind].effort[i + 2] & 0xFF);
-                int write_pos = i + (i * 20);
-                for (int expansion = 0; expansion < 4; expansion++) {
-                    int base_pos = write_pos + (expansion * 5);
-                    buf[base_pos] = byte_val;
-                    buf[base_pos + 1] = 0xFF;
-                    buf[base_pos + 2] = byte_val;
-                    buf[base_pos + 3] = 0xAA;
-                    buf[base_pos + 4] = byte_val ^ 0xFF;
-                }
-                
-                if (write_pos >= buffer_size) {
-                    for (int j = 0; j < 20; j++) {
-                        buf[write_pos + j] = 0xDE + (j % 4);
-                    }
-                }
-            }
-            
-            i += data_size * 20;
-            
-            // using the corrupted chunk randomly
-            if (buf[0] != 0) {
-                point_interp->positions[0] += buf[0] * 0.0001;
-            }
+            total_written += 20;
+        }
+        
+        // use the buffer
+        if (buf[0] != 0) {
+            point_interp->positions[0] += buf[0] * 0.0001;
         }
     }
-
 }
 
 int init() {
