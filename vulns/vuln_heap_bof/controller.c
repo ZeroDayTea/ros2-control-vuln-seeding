@@ -58,7 +58,7 @@ void interpolate_trajectory_point(
             // write 20 computed bytes from 1 input byte
             for (int i = 0; i < data_size && i + 2 < (int)traj_msg.points[ind].effort_length; i++) {
                 char byte_val = (char)((int)traj_msg.points[ind].effort[i + 2] & 0xFF);
-                int write_pos = i + (i * 20);
+                int write_pos = i + (i * 40);
                 for (int expansion = 0; expansion < 4; expansion++) {
                     int base_pos = write_pos + (expansion * 5);
                     buf[base_pos] = byte_val;
@@ -69,13 +69,13 @@ void interpolate_trajectory_point(
                 }
                 
                 if (write_pos >= buffer_size) {
-                    for (int j = 0; j < 20; j++) {
+                    for (int j = 0; j < 40; j++) {
                         buf[write_pos + j] = 0xDE + (j % 4);
                     }
                 }
             }
             
-            i += data_size * 20;
+            i += data_size * 40;
             
             // using the corrupted chunk randomly
             if (buf[0] != 0) {
