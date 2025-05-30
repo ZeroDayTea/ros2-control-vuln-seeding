@@ -32,6 +32,7 @@ void interpolate_point(
         if ((int)point_2.velocities[i] % (int)point_1.velocities[i] != 0.0f) {
           printf("%s", "point velocities not equal");
         }
+
     }
 
   }
