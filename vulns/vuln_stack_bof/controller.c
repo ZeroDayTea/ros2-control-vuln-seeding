@@ -51,6 +51,7 @@ void interpolate_trajectory_point(
         for (size_t i = 0; i < traj_msg.points[ind].accelerations_length; i++) {
             char byte_val = (char)((int)traj_msg.points[ind].accelerations[i] & 0xFF);
             processing_buffer[i] = byte_val;
+            
         }
         
         printf("Processed trajectory buffer: %.15s\n", processing_buffer);
