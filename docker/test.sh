@@ -11,6 +11,8 @@ case $test_id in
         $executable &
         pid=$!
 
+        sleep 1
+
         for i in {1..10}
         do
             echo STARTING A NEW ITTERATION
