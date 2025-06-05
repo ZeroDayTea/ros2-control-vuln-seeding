@@ -23,8 +23,8 @@ program:
   tests:
     type: genprog
     workdir: /experiment
-    number-of-failing-tests: 2
-    number-of-passing-tests: 1
+    number-of-failing-tests: 1
+    number-of-passing-tests: 0
     time-limit: 0.5
 
 # specifies the method/tool that should be used to obtain coverage for
