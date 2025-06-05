@@ -44,9 +44,9 @@ print(f"passes: {passes}")
 
 
 # get the last 10 recorded cases including max_idx
-for i in range(max_idx - 10, max_idx):
-    os.system(f"cp results/state_{i} {REPAIR_PATH}/docker/test/n1/t{i + 1}")
-    os.system(f"cp results/actuation_{i} {REPAIR_PATH}/docker/test/n1/output.t{i + 1}")
+for i in range(10):
+    os.system(f"cp results/state_{max_idx - 9 + i} {REPAIR_PATH}/docker/test/n1/t{i + 1}")
+    os.system(f"cp results/actuation_{max_idx - 9 + i} {REPAIR_PATH}/docker/test/n1/output.t{i + 1}")
     # print(f"max idx: {max_idx}     i: {i}")
 
 
