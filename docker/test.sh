@@ -13,7 +13,7 @@ case $test_id in
 
         for i in {1..10}
         do
-            echo starting iteration $i
+            echo STARTING A NEW ITTERATION
             # give the controller the next state
             # cp is not atomic but mv is
             cp $test_dir/$test_id/t$i ./tmp_state
