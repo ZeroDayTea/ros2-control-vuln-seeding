@@ -38,6 +38,7 @@ case $test_id in
 
         # If we got here then they all must have passed
         exit 0
+        ;;
 
     *)
         exit 1
