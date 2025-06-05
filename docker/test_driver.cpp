@@ -125,7 +125,7 @@ int main() {
     //     data->values[i] = 0.0; //.store(0.0, std::memory_order_relaxed);
     // }
 
-    // int myIdx = -1;
+    int myIdx = -1;
 
     // Vote* tmp_vote = static_cast<Vote*>(malloc(sizeof(Vote)));
     // State* tmp_state = static_cast<State*>(malloc(sizeof(State)));
@@ -135,25 +135,47 @@ int main() {
     init();
     //std::cout << "returned from init" << std::endl;
 
-    in->value = state->value;
-    in->cur_time_seconds = state->cur_time_sec; 
+    while (true) {
+        //tmp_state->idx = state->idx; //.load(std::memory_order_acquire);
 
-    step();
-    std::cout << "Idx recieved: " << state->idx << std::endl;
-
-
-    std::cout << "joint 0 name: " << state->value.joint_names[0] << std::endl;
-    std::cout << "position value: " << state->value.points[1].positions[0] << std::endl;
-    std::cout << "Vote value: " << out->vote.positions[0] << std::endl;
+        //std::cout << "Idx recieved: " << tmp_state->idx << std::endl;
 
 
-    data->value = out->vote;
+        if (state->idx > myIdx) {
+            // for (int i = 0; i < 5; i++) {
+            //     tmp_state->values[i] = state->values[i]; //.load(std::memory_order_relaxed);
+            // }
+            // tmp_state->value = state->value;
 
-    //tmp_vote->values[0] = myIdx; //FIXME out[0];
-    // std::cout << "out: " << tmp_vote->values[0] << std::endl;
-    //tmp_vote->idx = myIdx;
-    //data->value = tmp_vote->values[0]; //.store(tmp_vote->values[0], std::memory_order_relaxed);
-    data->idx = state->idx; //.store(tmp_vote->idx, std::memory_order_release);
+            //std::cout << "in: " << tmp_state->values[0] << "," << tmp_state->values[1] << "," << tmp_state->values[2] << "," << tmp_state->values[3] << "," << tmp_state->values[4] << std::endl;
+            // in[0] = tmp_state->values[0];
+            // in[1] = tmp_state->values[1];
+            // in[2] = tmp_state->values[2];
+            // in[3] = tmp_state->values[3];
+            // in[4] = tmp_state->values[4];
+
+            in->value = state->value;
+            in->cur_time_seconds = state->cur_time_sec; 
+
+            step();
+            std::cout << "Idx recieved: " << state->idx << std::endl;
+
+
+            std::cout << "joint 0 name: " << state->value.joint_names[0] << std::endl;
+            std::cout << "position value: " << state->value.points[1].positions[0] << std::endl;
+            std::cout << "Vote value: " << out->vote.positions[0] << std::endl;
+
+
+            data->value = out->vote;
+
+            //tmp_vote->values[0] = myIdx; //FIXME out[0];
+            // std::cout << "out: " << tmp_vote->values[0] << std::endl;
+            myIdx = state->idx;
+            //tmp_vote->idx = myIdx;
+            //data->value = tmp_vote->values[0]; //.store(tmp_vote->values[0], std::memory_order_relaxed);
+            data->idx = myIdx; //.store(tmp_vote->idx, std::memory_order_release);
+        }
+    }
 
     return 0;
 }
