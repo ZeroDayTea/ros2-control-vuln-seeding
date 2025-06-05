@@ -9,6 +9,7 @@ case $test_id in
     p1|p2|p3|p4|p5|p6|p7|p8|p9|p10|n1|n2)
 
         $executable &
+        pid=$!
 
         for i in {1..10}
         do
@@ -32,6 +33,8 @@ case $test_id in
             # exit $exit_code
             # ;;
         done
+
+        kill $pid
 
         # If we got here then they all must have passed
         exit 0
