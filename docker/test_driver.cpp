@@ -138,7 +138,7 @@ int main() {
     while (true) {
         //tmp_state->idx = state->idx; //.load(std::memory_order_acquire);
 
-        std::cout << "About to map memory in test driver"<< std::endl;
+        std::cout << "About to open the file"<< std::endl;
 
         int fd0 = open("_state", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
         // init the size of the file
@@ -146,6 +146,8 @@ int main() {
         write(fd0, "", 1);
         lseek(fd0, 0, SEEK_SET);
 
+
+        std::cout << "About to map the memory in test driver"<< std::endl;
         // map the file into memory
         State* state = static_cast<State*>(mmap(NULL, sizeof(State), PROT_WRITE, MAP_SHARED, fd0, 0));
         close(fd0);
@@ -154,7 +156,7 @@ int main() {
             exit(1);
         }
 
-
+        std::cout << "starting the logic"<< std::endl;
         if (state->idx > myIdx) {
     
 
