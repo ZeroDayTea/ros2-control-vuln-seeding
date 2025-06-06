@@ -156,17 +156,7 @@ int main() {
 
 
         if (state->idx > myIdx) {
-            // for (int i = 0; i < 5; i++) {
-            //     tmp_state->values[i] = state->values[i]; //.load(std::memory_order_relaxed);
-            // }
-            // tmp_state->value = state->value;
-
-            //std::cout << "in: " << tmp_state->values[0] << "," << tmp_state->values[1] << "," << tmp_state->values[2] << "," << tmp_state->values[3] << "," << tmp_state->values[4] << std::endl;
-            // in[0] = tmp_state->values[0];
-            // in[1] = tmp_state->values[1];
-            // in[2] = tmp_state->values[2];
-            // in[3] = tmp_state->values[3];
-            // in[4] = tmp_state->values[4];
+    
 
             in->value = state->value;
             in->cur_time_seconds = state->cur_time_sec; 
@@ -182,12 +172,8 @@ int main() {
 
             data->value = out->vote;
 
-            //tmp_vote->values[0] = myIdx; //FIXME out[0];
-            // std::cout << "out: " << tmp_vote->values[0] << std::endl;
             myIdx = state->idx;
-            //tmp_vote->idx = myIdx;
-            //data->value = tmp_vote->values[0]; //.store(tmp_vote->values[0], std::memory_order_relaxed);
-            data->idx = myIdx; //.store(tmp_vote->idx, std::memory_order_release);
+            data->idx = myIdx;
         }
 
         std::cout << "About to unmap memory at the end"<< std::endl;
