@@ -138,7 +138,7 @@ int main() {
     while (true) {
         //tmp_state->idx = state->idx; //.load(std::memory_order_acquire);
 
-        //std::cout << "Idx recieved: " << tmp_state->idx << std::endl;
+        std::cout << "About to map memory in test driver"<< std::endl;
 
         int fd0 = open("_state", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
         // init the size of the file
@@ -189,7 +189,8 @@ int main() {
             //data->value = tmp_vote->values[0]; //.store(tmp_vote->values[0], std::memory_order_relaxed);
             data->idx = myIdx; //.store(tmp_vote->idx, std::memory_order_release);
         }
-        
+
+        std::cout << "About to unmap memory at the end"<< std::endl;
         if (munmap(state, sizeof(State)) == -1) {
             std::cerr << "error: " << strerror(errno) << std::endl;
             exit(1);
