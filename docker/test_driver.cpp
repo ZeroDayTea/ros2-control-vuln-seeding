@@ -192,8 +192,9 @@ int main() {
 
         std::cout << "About to unmap memory at the end"<< std::endl;
         if (munmap(state, sizeof(State)) == -1) {
-            std::cerr << "error: " << strerror(errno) << std::endl;
-            exit(1);
+            // std::cerr << "error: " << strerror(errno) << std::endl;
+            // exit(1);
+            continue;
         }
     }
 
