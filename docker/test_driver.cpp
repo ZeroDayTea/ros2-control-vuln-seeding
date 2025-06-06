@@ -69,21 +69,21 @@ struct State {
 // };
 
 int main() {
-    // open or create the file with the proper permissions
-    int fd0 = open("_state", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-    // init the size of the file
-    lseek(fd0, sizeof(State), SEEK_SET);
-    write(fd0, "", 1);
-    lseek(fd0, 0, SEEK_SET);
+    // // open or create the file with the proper permissions
+    // int fd0 = open("_state", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    // // init the size of the file
+    // lseek(fd0, sizeof(State), SEEK_SET);
+    // write(fd0, "", 1);
+    // lseek(fd0, 0, SEEK_SET);
 
-    // map the file into memory
-    State* state = static_cast<State*>(mmap(NULL, sizeof(State), PROT_WRITE, MAP_SHARED, fd0, 0));
-    close(fd0);
-    if (state == MAP_FAILED) {
-        std::cerr << "error: " << strerror(errno) << std::endl;
-        exit(1);
-    }
-    std::cout << state << std::endl;
+    // // map the file into memory
+    // State* state = static_cast<State*>(mmap(NULL, sizeof(State), PROT_WRITE, MAP_SHARED, fd0, 0));
+    // close(fd0);
+    // if (state == MAP_FAILED) {
+    //     std::cerr << "error: " << strerror(errno) << std::endl;
+    //     exit(1);
+    // }
+    // std::cout << state << std::endl;
 
     // // open the internal state file
     // int fd1 = open("_internal", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
@@ -140,6 +140,20 @@ int main() {
 
         //std::cout << "Idx recieved: " << tmp_state->idx << std::endl;
 
+        int fd0 = open("_state", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+        // init the size of the file
+        lseek(fd0, sizeof(State), SEEK_SET);
+        write(fd0, "", 1);
+        lseek(fd0, 0, SEEK_SET);
+
+        // map the file into memory
+        State* state = static_cast<State*>(mmap(NULL, sizeof(State), PROT_WRITE, MAP_SHARED, fd0, 0));
+        close(fd0);
+        if (state == MAP_FAILED) {
+            std::cerr << "error: " << strerror(errno) << std::endl;
+            exit(1);
+        }
+
 
         if (state->idx > myIdx) {
             // for (int i = 0; i < 5; i++) {
@@ -174,6 +188,11 @@ int main() {
             //tmp_vote->idx = myIdx;
             //data->value = tmp_vote->values[0]; //.store(tmp_vote->values[0], std::memory_order_relaxed);
             data->idx = myIdx; //.store(tmp_vote->idx, std::memory_order_release);
+        }
+        
+        if (munmap(state, sizeof(State)) == -1) {
+            std::cerr << "error: " << strerror(errno) << std::endl;
+            exit(1);
         }
     }
 
