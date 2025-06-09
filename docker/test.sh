@@ -11,6 +11,7 @@ case $test_id in
         $executable &
         pid=$!
 
+        oracle=$test_dir/$test_id
 
         python3 check_distance.py $oracle
         exit_code=$?
