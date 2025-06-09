@@ -205,7 +205,7 @@ if __name__ == "__main__":
     oracle_path = sys.argv[1]
 
     #print(trust_scores)
-    with open("_data", "rb") as d, open("_state", "wb") as s: #, open(oracle_path, "rb") as o:
+    with open("_data", "rb") as d, open("_state", "w+b") as s: #, open(oracle_path, "rb") as o:
 
         # Zeroed data for State
         s.write(b'\0' * state_size)
