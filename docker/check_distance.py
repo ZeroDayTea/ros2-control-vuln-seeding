@@ -53,8 +53,9 @@ state_format = (
     'i'   # cur_time_sec (int32_t)
 )
 
-# Calculate the size of Vote
+# Calculate the size of Vote and State
 vote_size = struct.calcsize(vote_format)
+state_size = struct.calcsize(state_format)
 
 A = [None,None]
 
@@ -205,39 +206,9 @@ if __name__ == "__main__":
 
     #print(trust_scores)
     with open("_data", "rb") as d, open("_state", "wb") as s: #, open(oracle_path, "rb") as o:
-        
+
         # Zeroed data for State
-        idx = 0
-        joint_names_length = 0
-        joint_names = [b'\0' * 256] * 10  # 10 zeroed strings of 256 chars
-        points_length = 0
-        points = [
-            (
-                0, [0.0] * 100,  # positions_length, positions
-                0, [0.0] * 100,  # velocities_length, velocities
-                0, [0.0] * 100,  # accelerations_length, accelerations
-                0, [0.0] * 100,  # effort_length, effort
-                0, 0             # time_from_start_sec, time_from_start_nsec
-            )
-        ] * 256
-        cur_time_sec = 0
-
-        # Flatten points data for packing
-        flattened_points = []
-        for point in points:
-            flattened_points.extend(point)
-
-        # Pack the data
-        packed_data = struct.pack(
-            state_format,
-            idx,
-            joint_names_length,
-            b''.join(joint_names),
-            points_length,
-            *flattened_points,
-            cur_time_sec
-        )
-        s.write(packed_data)
+        s.write(b'\0' * state_size)
 
         #a.write(b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
         d.seek(0)
