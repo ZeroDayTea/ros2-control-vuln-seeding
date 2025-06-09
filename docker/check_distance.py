@@ -205,6 +205,7 @@ if __name__ == "__main__":
 
     #print(trust_scores)
     with open("_data", "rb") as d, open("_state", "wb") as s: #, open(oracle_path, "rb") as o:
+        
         # Zeroed data for State
         idx = 0
         joint_names_length = 0
