@@ -112,9 +112,8 @@ def driver(data, state, oracle):
         with open("test/n1/t" + str(i + 1), "rb") as ti:
             read_data = ti.read(state_size)
             next_input = struct.unpack(state_format, read_data)
-
-        state.seek(0)
-        state.write(struct.pack(state_format, *next_input))
+            state.seek(0)
+            state.write(read_data) #struct.pack(state_format, *next_input))
 
         print("We wrote the next data with index: " + str(next_input[0]))
 
@@ -211,7 +210,7 @@ if __name__ == "__main__":
     with open("_data", "rb") as d, open("_state", "w+b") as s: #, open(oracle_path, "rb") as o:
 
         # Zeroed data for State
-        s.write(b'\0' * state_size)
+        s.write(b'\x00' * state_size)
 
         #a.write(b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
         d.seek(0)

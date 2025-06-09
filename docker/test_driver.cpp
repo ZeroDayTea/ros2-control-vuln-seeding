@@ -138,7 +138,7 @@ int main() {
     while (true) {
         //tmp_state->idx = state->idx; //.load(std::memory_order_acquire);
 
-        std::cout << "Idx recieved: " << state->idx << std::endl;
+        std::cout << "Idx recieved from state: " << state->idx << std::endl;
 
 
         if (state->idx > myIdx) {
