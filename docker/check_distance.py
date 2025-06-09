@@ -6,11 +6,14 @@ import mmap
 # import subprocess
 # import os
 # import glob
+import time
 import numpy as np
 from numpy.linalg import norm
 import sys
 
 #import time
+
+NUM_TESTS = 10
 
 # Define the format string for MappedJointTrajectoryPoint
 mapped_joint_trajectory_point_format = (
@@ -33,6 +36,21 @@ mapped_joint_trajectory_point_size = struct.calcsize(mapped_joint_trajectory_poi
 vote_format = (
     'i' +         # idx (int)
     mapped_joint_trajectory_point_format  # value (MappedJointTrajectoryPoint)
+)
+
+# Define the format for MappedJointTrajectory
+mapped_joint_trajectory_format = (
+    'Q' +                # joint_names_length (size_t)
+    '2560s' +            # joint_names (10 strings of 256 chars each)
+    'Q' +                # points_length (size_t)
+    mapped_joint_trajectory_point_format * 256  # points array (256 MappedJointTrajectoryPoint)
+)
+
+# Define the format for State
+state_format = (
+    'i' +  # idx (int)
+    mapped_joint_trajectory_format +  # value (MappedJointTrajectory)
+    'i'   # cur_time_sec (int32_t)
 )
 
 # Calculate the size of Vote
@@ -72,77 +90,111 @@ def check_dist(A, epsilon):
         return False
     
 
-def driver(data, oracle):
+def driver(data, state, oracle):
     global myIdx 
     global A, trust_scores  # Indicate that we're using the global variables
     #A = modify_voter_positions(A)  # Update A with modified positions
     # print(f"My Index Is: {myIdx}")
-    try:
-        data.seek(0)
-        myVote  = struct.unpack(vote_format,data.read(vote_size))
-         # Extract the idx and MappedJointTrajectoryPoint value
-        vidx = myVote[0]
-
-        # print(f"Controller 0 index: {vidx}")
 
 
-        mapped_joint_trajectory_point = myVote[1:]
 
-        # Extract positions and velocities arrays
-        positions_length = mapped_joint_trajectory_point[0]
-        positions = mapped_joint_trajectory_point[1:101]  # 100 doubles for positions
-        velocities_length = mapped_joint_trajectory_point[101]
-        velocities = mapped_joint_trajectory_point[102:202]  # 100 doubles for velocities
+    for i in range(NUM_TESTS):
 
-        # print(f"Index: {vidx}")
-        # print(f"Positions Length: {positions_length}")
-        # print(f"Positions: {positions}")
-        # print(f"Velocities Length: {velocities_length}")
-        # print(f"Velocities: {velocities}")
-
-        # Save the trajectory point for later
-
-        A[0] = positions[0:6] + velocities[0:6]
-
-    except struct.error:
-        print("could not read file 0")
-
-    try:
-        oracle.seek(0)
-        myVote  = struct.unpack(vote_format,oracle.read(vote_size))
-         # Extract the idx and MappedJointTrajectoryPoint value
-        vidx = myVote[0]
-
-        # print(f"Controller 1 index: {vidx}")
-
-        mapped_joint_trajectory_point = myVote[1:]
-
-        # Extract positions and velocities arrays
-        positions_length = mapped_joint_trajectory_point[0]
-        positions = mapped_joint_trajectory_point[1:101]  # 100 doubles for positions
-        velocities_length = mapped_joint_trajectory_point[101]
-        velocities = mapped_joint_trajectory_point[102:202]  # 100 doubles for velocities
-
-        # print(f"Index: {vidx}")
-        # print(f"Positions Length: {positions_length}")
-        # print(f"Positions: {positions}")
-        # print(f"Velocities Length: {velocities_length}")
-        # print(f"Velocities: {velocities}")
-        # Save the trajectory point for later
-
-        A[1] = positions[0:6] + velocities[0:6]
-
-    except struct.error:
-        print("could not read file 1")
-
-    
-    print("The controller voted: " + str(A[0]))
-    print("The accepted vote was: " + str(A[1]))
+        # TODO write the next state and then wait and let the controller to vote
+        # FIXME don't hardcode the path - make the write atomic
+        # prev_input = None
+        # prev_state = state.read()
+        # prev_input = struct.unpack(state_format, read_data)
 
 
-    epsilon = 0.5 # slightly larger than noise
-    
-    return check_dist(A, epsilon)
+        next_input = None
+        with ("test/n1/t" + i, "rb") as ti:
+            read_data = ti.read()
+            next_input = struct.unpack(state_format, read_data)
+
+        state.seek(0)
+        state.write(struct.pack(state_format, next_input))
+
+        # next_idx = next_input[0]
+
+        # # write the next input with the previous idx so we dont trigger the controller without everything being there
+        # next_input[0] = prev_input[0]
+
+
+        time.sleep(0.001)
+
+        
+        try:
+            data.seek(0)
+            myVote  = struct.unpack(vote_format,data.read(vote_size))
+            # Extract the idx and MappedJointTrajectoryPoint value
+            vidx = myVote[0]
+
+            # print(f"Controller 0 index: {vidx}")
+
+
+            mapped_joint_trajectory_point = myVote[1:]
+
+            # Extract positions and velocities arrays
+            positions_length = mapped_joint_trajectory_point[0]
+            positions = mapped_joint_trajectory_point[1:101]  # 100 doubles for positions
+            velocities_length = mapped_joint_trajectory_point[101]
+            velocities = mapped_joint_trajectory_point[102:202]  # 100 doubles for velocities
+
+            # print(f"Index: {vidx}")
+            # print(f"Positions Length: {positions_length}")
+            # print(f"Positions: {positions}")
+            # print(f"Velocities Length: {velocities_length}")
+            # print(f"Velocities: {velocities}")
+
+            # Save the trajectory point for later
+
+            A[0] = positions[0:6] + velocities[0:6]
+
+        except struct.error:
+            print("could not read file 0")
+
+        try:
+            myVote = None
+            with open(oracle_path + "/output.t" +  i , "rb") as oracle:
+                myVote  = struct.unpack(vote_format,oracle.read(vote_size))
+            # Extract the idx and MappedJointTrajectoryPoint value
+            vidx = myVote[0]
+
+            # print(f"Controller 1 index: {vidx}")
+
+            mapped_joint_trajectory_point = myVote[1:]
+
+            # Extract positions and velocities arrays
+            positions_length = mapped_joint_trajectory_point[0]
+            positions = mapped_joint_trajectory_point[1:101]  # 100 doubles for positions
+            velocities_length = mapped_joint_trajectory_point[101]
+            velocities = mapped_joint_trajectory_point[102:202]  # 100 doubles for velocities
+
+            # print(f"Index: {vidx}")
+            # print(f"Positions Length: {positions_length}")
+            # print(f"Positions: {positions}")
+            # print(f"Velocities Length: {velocities_length}")
+            # print(f"Velocities: {velocities}")
+            # Save the trajectory point for later
+
+            A[1] = positions[0:6] + velocities[0:6]
+
+        except struct.error:
+            print("could not read file 1")
+
+        
+        print("The controller voted: " + str(A[0]))
+        print("The accepted vote was: " + str(A[1]))
+
+
+        epsilon = 0.5 # slightly larger than noise
+        
+        dist = check_dist(A, epsilon)
+        if not dist:
+            return False
+        
+    return True
 
     
     
@@ -152,16 +204,17 @@ if __name__ == "__main__":
     oracle_path = sys.argv[1]
 
     #print(trust_scores)
-    with open("_data", "rb") as d, open(oracle_path, "rb") as o:
+    with open("_data", "rb") as d, open("_state", "wb") as s: #, open(oracle_path, "rb") as o:
         #a.write(b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
         d.seek(0)
-        o.seek(0)
+        #o.seek(0)
 
         # Create memory maps for data0 and actuation
         data = mmap.mmap(d.fileno(), 0, access=mmap.ACCESS_READ)
-        oracle = mmap.mmap(o.fileno(), 0, access=mmap.ACCESS_READ)
+        state = mmap.mmap(s.fileno(), 0, access=mmap.ACCESS_WRITE)
+        #oracle = mmap.mmap(o.fileno(), 0, access=mmap.ACCESS_READ)
 
-        if driver(data,oracle):
+        if driver(data, state, oracle_path):
             exit(0)
         else:
             exit(1)

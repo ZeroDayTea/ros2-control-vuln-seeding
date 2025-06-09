@@ -163,6 +163,8 @@ int main() {
             in->value = state->value;
             in->cur_time_seconds = state->cur_time_sec; 
 
+            
+            std::cout << "before step"<< std::endl;
             step();
             std::cout << "Idx recieved: " << state->idx << std::endl;
 
