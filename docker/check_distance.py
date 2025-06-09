@@ -109,7 +109,7 @@ def driver(data, state, oracle):
 
 
         next_input = None
-        with ("test/n1/t" + i, "rb") as ti:
+        with ("test/n1/t" + str(i), "rb") as ti:
             read_data = ti.read()
             next_input = struct.unpack(state_format, read_data)
 
@@ -157,7 +157,7 @@ def driver(data, state, oracle):
 
         try:
             myVote = None
-            with open(oracle_path + "/output.t" +  i , "rb") as oracle:
+            with open(oracle_path + "/output.t" +  str(i) , "rb") as oracle:
                 myVote  = struct.unpack(vote_format,oracle.read(vote_size))
             # Extract the idx and MappedJointTrajectoryPoint value
             vidx = myVote[0]
