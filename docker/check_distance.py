@@ -211,7 +211,7 @@ if __name__ == "__main__":
     with open("_data", "rb") as d, open("_state", "w+b") as s: #, open(oracle_path, "rb") as o:
 
         # Zeroed data for State
-        s.write(b'\x00' * state_size)
+        s.write(b'\x00' * 832033) # this is hardcoded... bad...
 
         #a.write(b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
         d.seek(0)
