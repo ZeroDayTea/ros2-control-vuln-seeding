@@ -110,8 +110,9 @@ def driver(data, state, oracle):
 
         next_input = None
         with open("test/n1/t" + str(i + 1), "rb") as ti:
-            read_data = ti.read(state_size)
-            next_input = struct.unpack(state_format, read_data)
+            read_data = ti.read()
+            #next_input = struct.unpack(state_format, read_data)
+            print(f"length of the read data: {len(read_data)}, len of state type: {state_size}")
             state.seek(0)
             state.write(read_data) #struct.pack(state_format, *next_input))
 
