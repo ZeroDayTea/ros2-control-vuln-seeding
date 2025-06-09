@@ -154,6 +154,8 @@ int main() {
             // in[3] = tmp_state->values[3];
             // in[4] = tmp_state->values[4];
 
+            std::cout << "We got the new index: " << state->idx << std::endl;
+
             in->value = state->value;
             in->cur_time_seconds = state->cur_time_sec; 
 
