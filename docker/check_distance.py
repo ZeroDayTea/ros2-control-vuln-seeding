@@ -116,7 +116,7 @@ def driver(data, state, oracle):
             state.seek(0)
             state.write(read_data) #struct.pack(state_format, *next_input))
 
-        print("We wrote the next data with index: " + str(next_input[0]))
+        # print("We wrote the next data with index: " + str(next_input[0]))
 
         # next_idx = next_input[0]
 
