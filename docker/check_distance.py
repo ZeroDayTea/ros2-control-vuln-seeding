@@ -195,6 +195,7 @@ def driver(data, state, oracle):
         
         dist = check_dist(A, epsilon)
         if not dist:
+            continue
             return False
         
     return True
