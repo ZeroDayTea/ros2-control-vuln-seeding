@@ -5,7 +5,7 @@
 #include <iostream>
 #include <errno.h>
 #include <string.h>
-// #include <atomic>
+#include <atomic>
 #include <cstdint>
 
 extern "C" {
@@ -69,21 +69,21 @@ struct State {
 // };
 
 int main() {
-    // // open or create the file with the proper permissions
-    // int fd0 = open("_state", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-    // // init the size of the file
-    // lseek(fd0, sizeof(State), SEEK_SET);
-    // write(fd0, "", 1);
-    // lseek(fd0, 0, SEEK_SET);
+    // open or create the file with the proper permissions
+    int fd0 = open("_state", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    // init the size of the file
+    lseek(fd0, sizeof(State), SEEK_SET);
+    write(fd0, "", 1);
+    lseek(fd0, 0, SEEK_SET);
 
-    // // map the file into memory
-    // State* state = static_cast<State*>(mmap(NULL, sizeof(State), PROT_WRITE, MAP_SHARED, fd0, 0));
-    // close(fd0);
-    // if (state == MAP_FAILED) {
-    //     std::cerr << "error: " << strerror(errno) << std::endl;
-    //     exit(1);
-    // }
-    // std::cout << state << std::endl;
+    // map the file into memory
+    State* state = static_cast<State*>(mmap(NULL, sizeof(State), PROT_WRITE, MAP_SHARED, fd0, 0));
+    close(fd0);
+    if (state == MAP_FAILED) {
+        std::cerr << "error: " << strerror(errno) << std::endl;
+        exit(1);
+    }
+    std::cout << state << std::endl;
 
     // // open the internal state file
     // int fd1 = open("_internal", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
@@ -138,33 +138,25 @@ int main() {
     while (true) {
         //tmp_state->idx = state->idx; //.load(std::memory_order_acquire);
 
-        std::cout << "About to open the file"<< std::endl;
-
-        int fd0 = open("_state", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-        // init the size of the file
-        lseek(fd0, sizeof(State), SEEK_SET);
-        write(fd0, "", 1);
-        lseek(fd0, 0, SEEK_SET);
+        //std::cout << "Idx recieved: " << tmp_state->idx << std::endl;
 
 
-        std::cout << "About to map the memory in test driver"<< std::endl;
-        // map the file into memory
-        State* state = static_cast<State*>(mmap(NULL, sizeof(State), PROT_WRITE, MAP_SHARED, fd0, 0));
-        close(fd0);
-        if (state == MAP_FAILED) {
-            std::cerr << "error: " << strerror(errno) << std::endl;
-            exit(1);
-        }
-
-        std::cout << "starting the logic"<< std::endl;
         if (state->idx > myIdx) {
-    
+            // for (int i = 0; i < 5; i++) {
+            //     tmp_state->values[i] = state->values[i]; //.load(std::memory_order_relaxed);
+            // }
+            // tmp_state->value = state->value;
+
+            //std::cout << "in: " << tmp_state->values[0] << "," << tmp_state->values[1] << "," << tmp_state->values[2] << "," << tmp_state->values[3] << "," << tmp_state->values[4] << std::endl;
+            // in[0] = tmp_state->values[0];
+            // in[1] = tmp_state->values[1];
+            // in[2] = tmp_state->values[2];
+            // in[3] = tmp_state->values[3];
+            // in[4] = tmp_state->values[4];
 
             in->value = state->value;
             in->cur_time_seconds = state->cur_time_sec; 
 
-            
-            std::cout << "before step"<< std::endl;
             step();
             std::cout << "Idx recieved: " << state->idx << std::endl;
 
@@ -176,15 +168,12 @@ int main() {
 
             data->value = out->vote;
 
+            //tmp_vote->values[0] = myIdx; //FIXME out[0];
+            // std::cout << "out: " << tmp_vote->values[0] << std::endl;
             myIdx = state->idx;
-            data->idx = myIdx;
-        }
-
-        std::cout << "About to unmap memory at the end"<< std::endl;
-        if (munmap(state, sizeof(State)) == -1) {
-            // std::cerr << "error: " << strerror(errno) << std::endl;
-            // exit(1);
-            continue;
+            //tmp_vote->idx = myIdx;
+            //data->value = tmp_vote->values[0]; //.store(tmp_vote->values[0], std::memory_order_relaxed);
+            data->idx = myIdx; //.store(tmp_vote->idx, std::memory_order_release);
         }
     }
 
