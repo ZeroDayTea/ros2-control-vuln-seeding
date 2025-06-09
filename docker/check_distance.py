@@ -114,7 +114,7 @@ def driver(data, state, oracle):
             next_input = struct.unpack(state_format, read_data)
 
         state.seek(0)
-        state.write(struct.pack(state_format, next_input))
+        state.write(struct.pack(state_format, *next_input))
 
         # next_idx = next_input[0]
 
