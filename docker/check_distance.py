@@ -116,6 +116,8 @@ def driver(data, state, oracle):
         state.seek(0)
         state.write(struct.pack(state_format, *next_input))
 
+        print(f"We wrote the next data with index: {next_input[0]}")
+
         # next_idx = next_input[0]
 
         # # write the next input with the previous idx so we dont trigger the controller without everything being there
