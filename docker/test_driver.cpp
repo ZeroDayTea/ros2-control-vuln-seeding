@@ -7,6 +7,7 @@
 #include <string.h>
 #include <atomic>
 #include <cstdint>
+#include <fstream>
 // #include <boost/filesystem.hpp>
 
 extern "C" {
