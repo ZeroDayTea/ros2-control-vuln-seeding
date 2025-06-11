@@ -135,7 +135,15 @@ int main() {
     init();
     //std::cout << "returned from init" << std::endl;
 
+    std::string flag_path = "_flag";
+    int flag = open(flag_path.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    close(flag);
+
     while (true) {
+        // busy loop until we get a new state
+        while(std::filesystem::exists(std::filesystem::path(flag_path))){
+            continue;
+        }
         //tmp_state->idx = state->idx; //.load(std::memory_order_acquire);
 
         std::cout << "Idx recieved from state: " << state->idx << std::endl;
@@ -177,6 +185,10 @@ int main() {
             //data->value = tmp_vote->values[0]; //.store(tmp_vote->values[0], std::memory_order_relaxed);
             data->idx = myIdx; //.store(tmp_vote->idx, std::memory_order_release);
         }
+        
+        // set the flag again
+        int flag = open(flag_path.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+        close(flag);
     }
 
     return 0;
