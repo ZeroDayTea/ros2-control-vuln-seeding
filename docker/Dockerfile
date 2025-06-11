@@ -21,6 +21,7 @@ RUN sudo apt-get update \
  && sudo apt-get install -y --no-install-recommends \
       gcc \
       g++ \
+      libboost-filesystem-dev
       gcovr \
       libc6-dev \
       bc \

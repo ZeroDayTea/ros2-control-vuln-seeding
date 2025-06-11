@@ -7,7 +7,7 @@
 #include <string.h>
 #include <atomic>
 #include <cstdint>
-#include <filesystem>
+#include <boost/filesystem.hpp>
 
 extern "C" {
    #include "../controller.h"
@@ -142,7 +142,7 @@ int main() {
 
     while (true) {
         // busy loop until we get a new state
-        while(std::filesystem::exists(std::filesystem::path(flag_path))){
+        while(boost::filesystem::exists(boost::filesystem::path(flag_path))){
             continue;
         }
         //tmp_state->idx = state->idx; //.load(std::memory_order_acquire);
