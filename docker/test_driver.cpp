@@ -69,6 +69,11 @@ struct State {
 //     double values[2]; // dx, da
 // };
 
+bool fileExists(const std::string& fileName) {
+    std::ifstream infile(fileName);
+    return infile.good();
+}
+
 int main() {
     // open or create the file with the proper permissions
     int fd0 = open("_state", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
@@ -142,7 +147,7 @@ int main() {
 
     while (true) {
         // busy loop until we get a new state
-        while(boost::filesystem::exists(boost::filesystem::path(flag_path))){
+        while(fileExists(flag_path)){
             continue;
         }
         //tmp_state->idx = state->idx; //.load(std::memory_order_acquire);
