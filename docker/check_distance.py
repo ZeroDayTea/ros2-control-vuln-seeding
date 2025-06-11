@@ -102,24 +102,24 @@ def driver(data, state, oracle):
     # Run the tests
     for i in range(NUM_TESTS):
 
-        while not os.path.exists("_flag"):
-            time.sleep(0.01)
+        if os.path.exists("_flag"):
+            # Write the next state and then wait and let the controller to vote
+                # FIXME don't hardcode the path - make the write atomic
+                # prev_input = None
+                # prev_state = state.read()
+                # prev_input = struct.unpack(state_format, read_data)            
+            # next_input = None
+            with open("test/n1/t" + str(i + 1), "rb") as ti:
+                read_data = ti.read()
+                #next_input = struct.unpack(state_format, read_data)
+                print("length of the read data: " + str(len(read_data)) + ", len of state type: " + str(state_size))
+                state.seek(0)
+                state.write(read_data) #struct.pack(state_format, *next_input))
 
-        # Write the next state and then wait and let the controller to vote
-            # FIXME don't hardcode the path - make the write atomic
-            # prev_input = None
-            # prev_state = state.read()
-            # prev_input = struct.unpack(state_format, read_data)            
-        # next_input = None
-        with open("test/n1/t" + str(i + 1), "rb") as ti:
-            read_data = ti.read()
-            #next_input = struct.unpack(state_format, read_data)
-            print("length of the read data: " + str(len(read_data)) + ", len of state type: " + str(state_size))
-            state.seek(0)
-            state.write(read_data) #struct.pack(state_format, *next_input))
-
-        os.remove("_flag")
-
+        try:
+            os.remove("_flag")
+        except FileNotFoundError:
+            continue
         # print("We wrote the next data with index: " + str(next_input[0]))
 
         # next_idx = next_input[0]
