@@ -137,7 +137,7 @@ def driver(data, state, oracle):
             # Extract the idx and MappedJointTrajectoryPoint value
             vidx = myVote[0]
 
-            # print(f"Controller 0 index: {vidx}")
+            print(f"Controller index: {vidx}")
 
 
             mapped_joint_trajectory_point = myVote[1:]
@@ -168,7 +168,7 @@ def driver(data, state, oracle):
             # Extract the idx and MappedJointTrajectoryPoint value
             vidx = myVote[0]
 
-            # print(f"Controller 1 index: {vidx}")
+            print(f"Oracle index: {vidx}")
 
             mapped_joint_trajectory_point = myVote[1:]
 
