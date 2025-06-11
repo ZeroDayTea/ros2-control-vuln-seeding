@@ -7,6 +7,7 @@
 #include <string.h>
 #include <atomic>
 #include <cstdint>
+#include <filesystem>
 
 extern "C" {
    #include "../controller.h"
