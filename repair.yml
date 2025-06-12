@@ -13,12 +13,12 @@ program:
   build-instructions:
     time-limit: 10
     steps:
-      - gcc -c -o controller.o controller.c
+      - g++ -c -o controller.o controller.c
       - g++ -c -std=c++17 -o controller_main.o ../lib/test_driver.cpp
       - g++ -o controller controller.o controller_main.o
     steps-for-coverage:
-       - gcc -c -o controller.o controller.c --coverage
-       - g++ -c -std=c++17 -o controller_main.o ../lib/test_driver.cpp --coverage
+       - g++ -c -o controller.o controller.c --coverage
+       - g++ -c -std=c++17 -o controller_main.o ../lib/test_driver.cpp
        - g++ -o controller controller.o controller_main.o --coverage
   tests:
     type: genprog
