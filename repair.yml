@@ -14,11 +14,11 @@ program:
     time-limit: 10
     steps:
       - gcc -c -o controller.o controller.c
-      - g++ -c -std=c++11 -o controller_main.o ../lib/test_driver.cpp
+      - g++ -c -std=c++17 -o controller_main.o ../lib/test_driver.cpp
       - g++ -o controller controller.o controller_main.o
     steps-for-coverage:
        - gcc -c -o controller.o controller.c --coverage
-       - g++ -c -std=c++11 -o controller_main.o ../lib/test_driver.cpp
+       - g++ -c -std=c++17 -o controller_main.o ../lib/test_driver.cpp
        - g++ -o controller controller.o controller_main.o --coverage
   tests:
     type: genprog
