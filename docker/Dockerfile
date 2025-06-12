@@ -17,11 +17,11 @@ RUN apt-get update \
 USER docker
 
 RUN sudo ln -sf /usr/share/zoneinfo/EST /etc/localtime
-RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
-locale-gen
+# RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+RUN locale-gen
 ENV LANG=en_US.UTF-8 \
-LANGUAGE=en_US:en \
-LC_ALL=en_US.UTF-8
+ && LANGUAGE=en_US:en \
+ && LC_ALL=en_US.UTF-8
 
 # install dependencies
 RUN sudo apt-get update \
