@@ -16,7 +16,7 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 USER docker
 
-RUN ln -sf /usr/share/zoneinfo/EST /etc/localtime
+RUN sudo ln -sf /usr/share/zoneinfo/EST /etc/localtime
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
 locale-gen
 ENV LANG=en_US.UTF-8 \
