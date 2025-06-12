@@ -8,7 +8,7 @@
 #include <atomic>
 #include <cstdint>
 #include <fstream>
-// #include <boost/filesystem.hpp>
+#include <filesystem>
 
 extern "C" {
    #include "../controller.h"
@@ -149,7 +149,7 @@ int main() {
     while (true) {
         std::cout << "Top of the running loop" << std::endl;
         // busy loop until we get a new state
-        while(fileExists(flag_path)){
+        while(std::filesystem::exists(std::filesystem::path(flag_path))){
             std::cout << "The flag exists - so we are waiting" << std::endl;
             continue;
         }
