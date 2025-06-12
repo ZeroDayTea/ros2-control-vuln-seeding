@@ -119,6 +119,7 @@ def driver(data, state, oracle):
         try:
             os.remove("_flag")
         except FileNotFoundError:
+            print("Driver - the flag does not exist")
             continue
         # print("We wrote the next data with index: " + str(next_input[0]))
 

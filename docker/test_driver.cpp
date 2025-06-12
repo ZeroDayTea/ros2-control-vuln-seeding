@@ -124,7 +124,7 @@ int main() {
     }
     std::cout << data << std::endl;
 
-    std::cout << "vote: " << sizeof(Vote) << std::endl;
+    // std::cout << "vote: " << sizeof(Vote) << std::endl;
 
     // FIXME maybe init value here...
     data->idx = 0; //.store(0, std::memory_order_relaxed);
@@ -149,11 +149,14 @@ int main() {
     while (true) {
         // busy loop until we get a new state
         while(fileExists(flag_path)){
+            std::cout << "The flag exists - so we are waiting" << state->idx << std::endl;
             continue;
         }
         //tmp_state->idx = state->idx; //.load(std::memory_order_acquire);
 
-        std::cout << "Idx recieved from state: " << state->idx << std::endl;
+        std::cout << "The flag does not exist! So the controller runs" << std::endl;
+
+        std::cout << "Idx recieved from state: " << std::endl;
 
 
         if (state->idx > myIdx) {
@@ -178,9 +181,9 @@ int main() {
             std::cout << "Idx recieved: " << state->idx << std::endl;
 
 
-            std::cout << "joint 0 name: " << state->value.joint_names[0] << std::endl;
-            std::cout << "position value: " << state->value.points[1].positions[0] << std::endl;
-            std::cout << "Vote value: " << out->vote.positions[0] << std::endl;
+            // std::cout << "joint 0 name: " << state->value.joint_names[0] << std::endl;
+            // std::cout << "position value: " << state->value.points[1].positions[0] << std::endl;
+            // std::cout << "Vote value: " << out->vote.positions[0] << std::endl;
 
 
             data->value = out->vote;
@@ -194,6 +197,7 @@ int main() {
         }
         
         // set the flag again
+        std::cout << "Setting the flag again" << std::endl;
         int flag = open(flag_path.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
         close(flag);
     }
