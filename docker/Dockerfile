@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:16.04
 ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
@@ -19,8 +19,8 @@ USER docker
 # install dependencies
 RUN sudo apt-get update \
  && sudo apt-get install -y --no-install-recommends \
-      gcc \
-      g++ \
+      gcc-10 \
+      g++-10 \
      #  libboost-filesystem-dev \
       gcovr \
       libc6-dev \
