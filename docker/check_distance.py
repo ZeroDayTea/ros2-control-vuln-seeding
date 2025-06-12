@@ -57,6 +57,7 @@ state_format = (
 vote_size = struct.calcsize(vote_format)
 state_size = struct.calcsize(state_format)
 
+
 A = [None,None]
 
 def cosine_distance(vec1, vec2):
@@ -120,7 +121,7 @@ def driver(data, state, oracle):
             os.remove("_flag")
         except FileNotFoundError:
             print("Driver - the flag does not exist")
-            
+
         # print("We wrote the next data with index: " + str(next_input[0]))
 
         # next_idx = next_input[0]
@@ -131,14 +132,16 @@ def driver(data, state, oracle):
 
         time.sleep(0.001)
 
+        cidx = -1
+        oidx = -1
         
         try:
             data.seek(0)
             myVote  = struct.unpack(vote_format,data.read(vote_size))
             # Extract the idx and MappedJointTrajectoryPoint value
-            vidx = myVote[0]
+            cidx = myVote[0]
 
-            print("Controller index: " + str(vidx))
+            print("Controller index: " + str(cidx))
 
 
             mapped_joint_trajectory_point = myVote[1:]
@@ -167,9 +170,9 @@ def driver(data, state, oracle):
             with open(oracle_path + "/output.t" +  str(i + 1) , "rb") as oracle:
                 myVote  = struct.unpack(vote_format,oracle.read(vote_size))
             # Extract the idx and MappedJointTrajectoryPoint value
-            vidx = myVote[0]
+            oidx = myVote[0]
 
-            print("Oracle index: " + str(vidx))
+            print("Oracle index: " + str(oidx))
 
             mapped_joint_trajectory_point = myVote[1:]
 
@@ -194,6 +197,9 @@ def driver(data, state, oracle):
         print("Index: " + str(i))
         print("The controller voted: " + str(A[0]))
         print("The accepted vote was: " + str(A[1]))
+
+        if cidx != oidx:
+            return False
 
 
         epsilon = 0.5 # slightly larger than noise
