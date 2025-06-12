@@ -5,7 +5,7 @@ ENV LANG C.UTF-8
 
 # create docker user
 RUN apt-get update \
- && apt-get install --no-install-recommends -y sudo patch \
+ && apt-get install --no-install-recommends -y sudo patch locales \
  && useradd -ms /bin/bash docker \
  && echo 'docker ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
  && adduser docker sudo \
@@ -15,6 +15,13 @@ RUN apt-get update \
  && sudo chown -R docker /usr/local/bin \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 USER docker
+
+RUN ln -sf /usr/share/zoneinfo/EST /etc/localtime
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+locale-gen
+ENV LANG=en_US.UTF-8 \
+LANGUAGE=en_US:en \
+LC_ALL=en_US.UTF-8
 
 # install dependencies
 RUN sudo apt-get update \
