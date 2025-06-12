@@ -191,7 +191,7 @@ def driver(data, state, oracle):
         except struct.error:
             print("could not read file 1")
 
-        
+        print("Index: " + str(i))
         print("The controller voted: " + str(A[0]))
         print("The accepted vote was: " + str(A[1]))
 
