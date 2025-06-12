@@ -147,9 +147,10 @@ int main() {
     close(flag);
 
     while (true) {
+        std::cout << "Top of the running loop" << std::endl;
         // busy loop until we get a new state
         while(fileExists(flag_path)){
-            std::cout << "The flag exists - so we are waiting" << state->idx << std::endl;
+            std::cout << "The flag exists - so we are waiting" << std::endl;
             continue;
         }
         //tmp_state->idx = state->idx; //.load(std::memory_order_acquire);
