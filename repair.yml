@@ -34,7 +34,7 @@ coverage:
     type: gcov
     files-to-instrument:
       - controller.c
-  #load-from-file: coverage.yml
+  load-from-file: coverage.yml
 
 localization:
   type: spectrum
