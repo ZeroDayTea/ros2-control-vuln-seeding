@@ -54,9 +54,9 @@ transformations:
     - type: delete-statement
     - type: replace-statement
     - type: prepend-statement
-    - type: template
-      match: "<="
-      rewrite: "<"
+    # - type: template
+    #   match: "<="
+    #   rewrite: "<"
 
 optimizations:
   # ignore-equivalent-insertions: yes
