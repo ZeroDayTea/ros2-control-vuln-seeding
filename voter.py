@@ -381,15 +381,18 @@ if __name__ == "__main__":
             
             flag_path = "_flag"
 
-            while True:
-                if os.path.exists(flag_path):
-                    print("New vote cycle beginning...")
-                    start_time = time.perf_counter_ns()
-                    driver(data0, data1, data2, actuation)
-                    os.remove(flag_path)
-                    end_time = time.perf_counter_ns()
-                    tot_time = end_time - start_time
-                    print("Vote cycle took: " + str(tot_time) + " ns")
+            with open("_time") as t:
+                while True:
+                    if os.path.exists(flag_path):
+                        print("New vote cycle beginning...")
+                        
+                        start_time = time.perf_counter_ns()
+                        driver(data0, data1, data2, actuation)
+                        os.remove(flag_path)
+                        end_time = time.perf_counter_ns()
+                        tot_time = end_time - start_time
+
+                        t.write(str(tot_time) + "\n")
 
 
             # # Start timer
