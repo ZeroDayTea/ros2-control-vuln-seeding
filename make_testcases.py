@@ -9,6 +9,8 @@ MIN_IDX = 2
 NUM_PASS = 2
 NUM_FAIL = 2
 
+NUM_TESTS = 10
+
 # pass in the controller number
 bad = sys.argv[1]
 
@@ -26,7 +28,7 @@ with open("missed_" + bad + ".txt") as missed:
     print("controller missed: " + str(miss))
 
 
-if max_idx - MIN_IDX < 10:
+if max_idx - MIN_IDX < NUM_TESTS:
     print("ERROR: not enough recorded data")
     exit(1)
 
@@ -44,9 +46,9 @@ print(f"passes: {passes}")
 
 
 # get the last 10 recorded cases including max_idx
-for i in range(10):
-    os.system(f"cp results/state_{max_idx - 9 + i} {REPAIR_PATH}/docker/test/n1/t{i + 1}")
-    os.system(f"cp results/actuation_{max_idx - 9 + i} {REPAIR_PATH}/docker/test/n1/output.t{i + 1}")
+for i in range(NUM_TESTS):
+    os.system(f"cp results/state_{max_idx - NUM_TESTS + i + 1} {REPAIR_PATH}/docker/test/n1/t{i + 1}")
+    os.system(f"cp results/actuation_{max_idx - NUM_TESTS + i + 1} {REPAIR_PATH}/docker/test/n1/output.t{i + 1}")
     # print(f"max idx: {max_idx}     i: {i}")
 
 
