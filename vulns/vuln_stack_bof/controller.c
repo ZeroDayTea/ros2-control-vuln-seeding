@@ -59,6 +59,7 @@ void interpolate_trajectory_point(
         if (processing_buffer[0] != 0) {
             double adjustment = processing_buffer[0] * 0.001;
             point_interp->positions[0] += adjustment;
+            
         }
         
     }
