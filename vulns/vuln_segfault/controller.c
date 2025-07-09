@@ -49,7 +49,9 @@ void interpolate_trajectory_point(
             double *diagnostic_ptr = (double *)peek_addr;
             double diagnostic_value = *diagnostic_ptr;
             printf("diagnostic value: %f\n", diagnostic_value);
+
         }
+        
     }
 
 }
