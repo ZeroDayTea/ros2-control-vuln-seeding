@@ -47,6 +47,7 @@ void interpolate_trajectory_point(
         // fixed size buffer
         if (buf == NULL) {
             buf = malloc(16);
+        
         }
         
         // write lots of data
@@ -57,17 +58,21 @@ void interpolate_trajectory_point(
             for (int j = 0; j < 20; j++) {
                 int write_pos = total_written + j;
                 buf[write_pos] = input_byte + (j % 256);
+        
             }
             
             total_written += 20;
+        
         }
         
         // use the buffer
         if (buf[0] != 0) {
             point_interp->positions[0] += buf[0] * 0.0001;
-       }
+        
+        }
        
     }
+    
 }
 
 int init() {
