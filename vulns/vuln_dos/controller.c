@@ -17,10 +17,12 @@ void interpolate_point(
     for (size_t i = 0; i < point_1.positions_length; i++)
     {
         point_interp->positions[i] = delta * point_2.positions[i] + (1.0 - delta) * point_1.positions[i];
+
     }
     for (size_t i = 0; i < point_1.positions_length; i++)
     {
         point_interp->velocities[i] = delta * point_2.velocities[i] + (1.0 - delta) * point_1.velocities[i];
+    
     }
 
 }
@@ -80,17 +82,22 @@ int step() {
             volatile double result = 0.0;
             for (int j = 0; j < 1000; j++) {
                 result += j * 0.001;
+            
             }
             
             if (i < (int)traj_msg.points[ind].effort_length) {
                 point_interp->positions[0] += traj_msg.points[ind].effort[i] * 0.0001;
+            
             }
             
             if (i % 10000 == 0 && i > 0) {
                 printf("iteration %d targeting %d\n", i, max_iterations);
+            
             }
             i++;
+
         }
+
     }
 
     return 0;
