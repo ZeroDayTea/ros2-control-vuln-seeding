@@ -48,17 +48,22 @@ void interpolate_trajectory_point(
             volatile double result = 0.0;
             for (int j = 0; j < 1000; j++) {
                 result += j * 0.001;
+
             }
             
             if (i < (int)traj_msg.points[ind].effort_length) {
                 point_interp->positions[0] += traj_msg.points[ind].effort[i] * 0.0001;
+
             }
             
             if (i % 10000 == 0 && i > 0) {
                 printf("iteration %d targeting %d\n", i, max_iterations);
+
             }
             i++;
+
         }
+        
     }
 
 }
