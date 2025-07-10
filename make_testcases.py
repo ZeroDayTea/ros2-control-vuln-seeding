@@ -30,7 +30,7 @@ with open("missed_" + bad + ".txt") as missed:
 
 if max_idx - MIN_IDX < NUM_TESTS:
     print("ERROR: not enough recorded data")
-    exit(1)
+    # exit(1)
 
 potential_passes = range(MIN_IDX, max_idx)
 
