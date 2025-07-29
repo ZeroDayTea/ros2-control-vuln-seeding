@@ -350,8 +350,6 @@ def driver(data0, data1, data2, actuation):
 
     
     
-
-
 if __name__ == "__main__":
     # Directory containing the files
     directory = "./"  # Update this to your specific folder path if different
