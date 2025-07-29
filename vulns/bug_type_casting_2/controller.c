@@ -23,11 +23,13 @@ void interpolate_point(
     for (size_t i = 0; i < point_1.positions_length; i++)
     {
       point_interp->positions[i] = (double)(int)(delta * point_2.positions[i] + (1.0 - delta) * point_1.positions[i]);
+
     }
     for (size_t i = 0; i < point_1.positions_length; i++)
     {
       point_interp->velocities[i] =
         (double)(int)(delta * point_2.velocities[i] + (1.0 - delta) * point_1.velocities[i]);
+        
     }
   
   }

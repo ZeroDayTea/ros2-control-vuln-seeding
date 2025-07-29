@@ -219,7 +219,7 @@ controller_interface::return_type RobotController::update(const rclcpp::Time & t
     std::cout << "Stored the index" << std::endl;
 
     // Sleep so that the controller can run
-    rclcpp::sleep_for(std::chrono::nanoseconds(1000000));
+rclcpp::sleep_for(std::chrono::nanoseconds(1000000));
 
     // Trigger the vote
     std::string flag_path = "_flag";
