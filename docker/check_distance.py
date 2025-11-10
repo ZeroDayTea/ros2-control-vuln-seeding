@@ -13,7 +13,7 @@ import sys
 
 #import time
 
-NUM_TESTS = 2
+NUM_TESTS = 3
 
 # Define the format string for MappedJointTrajectoryPoint
 mapped_joint_trajectory_point_format = (
