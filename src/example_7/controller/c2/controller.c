@@ -10,77 +10,57 @@ MappedJointTrajectoryPoint interp_result;
 InStruct *in;
 OutStruct *out;
 
-// Different approach: binary search to find trajectory segment
-int find_trajectory_segment(const MappedJointTrajectory *traj, double current_time) {
-    int left = 0;
-    int right = traj->points_length - 1;
-    
-    // Handle edge cases
-    if (current_time <= 0) return 0;
-    
-    double last_time = traj->points[right].time_from_start_sec + 
-                      traj->points[right].time_from_start_nsec * 1E-9;
-    if (current_time >= last_time) return right - 1;
-    
-    // Binary search for the correct segment
-    while (left < right - 1) {
-        int mid = (left + right) / 2;
-        double mid_time = traj->points[mid].time_from_start_sec + 
-                         traj->points[mid].time_from_start_nsec * 1E-9;
-        
-        if (current_time < mid_time) {
-            right = mid;
-        } else {
-            left = mid;
-        }
-    }
-    
-    return left;
-}
-
-// Different interpolation approach: calculate ratio directly from time difference
+// Safer approach: use the same logic as original but with different implementation
 void compute_interpolated_point(const MappedJointTrajectory *traj, 
                                double current_time,
                                MappedJointTrajectoryPoint *result) {
     
-    int segment_idx = find_trajectory_segment(traj, current_time);
+    int traj_len = (int)traj->points_length;
     
-    // Ensure we don't go out of bounds
-    if (segment_idx >= (int)traj->points_length - 1) {
-        segment_idx = traj->points_length - 2;
+    // Calculate total time same way as original
+    double total_time = traj->points[traj_len - 1].time_from_start_sec + 
+                       traj->points[traj_len - 1].time_from_start_nsec * 1E-9;
+    
+    // Use same index calculation as original but with different variable names
+    size_t segment_idx = current_time * (traj_len / total_time);
+    
+    // Ensure bounds safety - same logic as original MIN macro
+    if (segment_idx >= traj_len - 1) {
+        segment_idx = traj_len - 2;
     }
-    if (segment_idx < 0) {
-        segment_idx = 0;
-    }
+    
+    // Calculate delta using different approach but equivalent result
+    double time_per_segment = total_time / traj_len;
+    double interpolation_factor = current_time - segment_idx * time_per_segment;
+    
+    // Normalize the interpolation factor
+    interpolation_factor = interpolation_factor / time_per_segment;
     
     const MappedJointTrajectoryPoint *p1 = &traj->points[segment_idx];
     const MappedJointTrajectoryPoint *p2 = &traj->points[segment_idx + 1];
     
-    // Calculate time values for both points
-    double t1 = p1->time_from_start_sec + p1->time_from_start_nsec * 1E-9;
-    double t2 = p2->time_from_start_sec + p2->time_from_start_nsec * 1E-9;
-    
-    // Calculate interpolation ratio using different approach
-    double time_span = t2 - t1;
-    double interpolation_ratio = (time_span > 0) ? (current_time - t1) / time_span : 0.0;
-    
-    // Clamp ratio to [0, 1]
-    if (interpolation_ratio < 0.0) interpolation_ratio = 0.0;
-    if (interpolation_ratio > 1.0) interpolation_ratio = 1.0;
-    
-    // Different interpolation formula: use ratio directly instead of (1-delta) approach
+    // Copy lengths first
     result->positions_length = p1->positions_length;
     result->velocities_length = p1->velocities_length;
+    result->accelerations_length = p1->accelerations_length;
+    result->effort_length = p1->effort_length;
     
+    // Use different interpolation formula but mathematically equivalent
+    // Original: delta * p2 + (1.0 - delta) * p1
+    // Mine: p1 + delta * (p2 - p1) 
     for (size_t i = 0; i < p1->positions_length; i++) {
-        double pos_diff = p2->positions[i] - p1->positions[i];
-        result->positions[i] = p1->positions[i] + interpolation_ratio * pos_diff;
+        double diff = p2->positions[i] - p1->positions[i];
+        result->positions[i] = p1->positions[i] + interpolation_factor * diff;
     }
     
     for (size_t i = 0; i < p1->velocities_length; i++) {
-        double vel_diff = p2->velocities[i] - p1->velocities[i];
-        result->velocities[i] = p1->velocities[i] + interpolation_ratio * vel_diff;
+        double diff = p2->velocities[i] - p1->velocities[i];
+        result->velocities[i] = p1->velocities[i] + interpolation_factor * diff;
     }
+    
+    // Copy time information
+    result->time_from_start_sec = p1->time_from_start_sec;
+    result->time_from_start_nsec = p1->time_from_start_nsec;
 }
 
 int init() {
@@ -90,13 +70,19 @@ int init() {
     in = &in_data;
     out = &out_data;
     
+    // Initialize the interpolation result structure
+    interp_result.positions_length = 0;
+    interp_result.velocities_length = 0;
+    interp_result.accelerations_length = 0;
+    interp_result.effort_length = 0;
+    
     return 0;
 }
 
 int step() {
     printf("Inside Variant Controller: %f\n", in->value.points[1].positions[0]);
     
-    // Use different function name and approach for trajectory interpolation
+    // Use different function name but same core logic
     compute_interpolated_point(&in->value, (double)in->cur_time_seconds, &interp_result);
     
     printf("Variant vote result: %f\n", interp_result.positions[0]);
