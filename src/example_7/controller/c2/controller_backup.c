@@ -39,6 +39,15 @@ void interpolate_point(
     //auto last_time = traj_msg.points[traj_len - 1].time_from_start;
     double total_time = traj_msg.points[traj_len - 1].time_from_start_sec + traj_msg.points[traj_len - 1].time_from_start_nsec * 1E-9;
     //double total_time = last_time.sec + last_time.nanosec * 1E-9;
+
+        // Check if mission has ended
+    if (cur_time_seconds > total_time) {
+        // Keep final positions but zero velocities after mission completion
+        for (size_t i = 0; i < point_interp->velocities_length; i++) {
+            point_interp->velocities[i] = 0.0;
+        }
+        return;
+    }
   
     size_t ind = cur_time_seconds * (traj_len / total_time);
     ind = MIN( (double) ind, traj_len - 2);
