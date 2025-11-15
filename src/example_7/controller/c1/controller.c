@@ -78,8 +78,6 @@ void interpolate_point(
     ind = MIN( (double) ind, traj_len - 2);
     double delta = cur_time_seconds - ind * (total_time / traj_len);
 
-    if (delta < 0.0) delta = 0.0;
-    if (delta > 1.0) delta = 1.0;
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
   }
 
