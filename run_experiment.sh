@@ -81,10 +81,12 @@ for vuln_dir in "$VULNS_DIR"/*; do
             ./controller.sh &
             controllers=$!
 
-            sleep 5
+            sleep 7
 
             python3 voter.py &
             voter=$!
+
+            sleep 2
 
             ./send_trajectory.sh &
             trajectory=$!
@@ -92,7 +94,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
             sleep 5 # FIXME figure out how long this needs to be
 
             # Try to start the trajectory with retries
-            # MAX_START_RETRIES=5
+            MAX_START_RETRIES=5
             START_CHECK_TIMEOUT=5
             trajectory_started=false
             if check_system_started $START_CHECK_TIMEOUT; then
