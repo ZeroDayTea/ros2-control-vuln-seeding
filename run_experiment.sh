@@ -7,7 +7,7 @@
 
 # Script to automate vulnerability testing
 VULNS_DIR="vulns"
-NUM_RUNS=10
+NUM_RUNS=
 LOG_FILE="repair_log.log"
 
 # Check if vulns directory exists
@@ -55,6 +55,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
     if [ -d "$vuln_dir" ]; then
         vuln_name=$(basename "$vuln_dir")
         echo "Testing vulnerability: $vuln_name"
+
         
         rm -rf log/ build/ install/
         ./copy_vuln.sh $vuln_name
@@ -209,11 +210,11 @@ for vuln_dir in "$VULNS_DIR"/*; do
                         
                     fi
 
-                    echo ", $repair_succeeded, $repair_time\n" >> $LOGFILE
+                    echo ", $repair_succeeded, $repair_time\n" >> $LOG_FILE
 
                     ;;
                 "DETECTED_NO_REPAIR") 
-                    echo ", Repair Failed\n" >> $LOG_FILE
+                    echo ", 1, Repair Failed\n" >> $LOG_FILE
                     # Your result copying logic here
                     ;;
                 "NO_DETECTION")
