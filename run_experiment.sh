@@ -18,9 +18,7 @@ fi
 
 check_system_started() {
     local timeout=$1
-    local start_time=$(date +%s)
-    
-    while [ $(($(date +%s) - start_time)) -lt $timeout ]; do
+    for ((retry=1; retry<=$timeout; retry++)); do
         if [ -d "results" ]; then
             local result_count=$(ls results 2>/dev/null | wc -l)
             if [ $result_count -gt 0 ]; then
@@ -83,6 +81,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
 
             sleep 7
 
+            echo "Starting Voter"
             python3 voter.py &
             voter=$!
 
