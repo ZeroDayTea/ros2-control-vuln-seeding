@@ -62,6 +62,8 @@ for vuln_dir in "$VULNS_DIR"/*; do
         ./build.sh
         ./build_controllers.sh
         source ./source_workspace.sh
+
+        mkdir recorded_patches/$vuln_name
         
         
         # Add your testing logic here
@@ -210,7 +212,6 @@ for vuln_dir in "$VULNS_DIR"/*; do
             echo "Trial result: $result_status"
 
             # Copy Results based on result_status
-            echo "$vuln_name, $run, $result_status" >> $LOG_FILE
             case $result_status in
                 "SUCCESS_REPAIR")
                     echo "Parsing repair results from darjeeling log..."
@@ -241,6 +242,8 @@ for vuln_dir in "$VULNS_DIR"/*; do
                             # Determine if repair succeeded (non-zero plausible patches = success)
                             if [ "$plausible_patches" -gt 0 ] 2>/dev/null; then
                                 repair_succeeded=1
+
+                                ls patches/ | cp "recorded_patches/$vuln_name-$run.patch"
                             else
                                 repair_succeeded=0
 
@@ -253,6 +256,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
                         fi
                         
                     fi
+
 
                     echo "$vuln_name, $run, $result_status, $repair_succeeded, $repair_time" >> $LOG_FILE
 
