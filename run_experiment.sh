@@ -92,6 +92,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
             # Try to start the trajectory with retries
             MAX_START_RETRIES=5
             START_CHECK_TIMEOUT=5
+            trajectory_started=false
             for ((retry=1; retry<=MAX_START_RETRIES; retry++)); do
                 echo "Attempting to send trajectory (attempt $retry/$MAX_START_RETRIES)"
                 
@@ -100,7 +101,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
                 
                 # Check if system started properly
                 if check_system_started $START_CHECK_TIMEOUT; then
-                    trajectory_started=true
+                    $trajectory_started=true
                     break
                 else
                     echo "Trajectory not received, killing trajectory process and retrying..."
@@ -115,6 +116,10 @@ for vuln_dir in "$VULNS_DIR"/*; do
                 # Clean up processes
                 kill $voter $controllers $ros_node $trajectory 2>/dev/null || true
                 wait $voter $controllers $ros_node $trajectory 2>/dev/null || true
+                
+                # reset this run and try it again. The mission was not recieved by the ros_node
+                ((run--))
+                
                 continue  # Skip to next run
             fi
 
