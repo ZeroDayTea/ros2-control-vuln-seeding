@@ -47,6 +47,8 @@ trap cleanup EXIT
 # Init Experiment Log
 echo "" > $LOG_FILE
 
+pkill -f ros
+
 # Iterate through each vulnerability directory
 for vuln_dir in "$VULNS_DIR"/*; do
     # Check if it's actually a directory
@@ -68,8 +70,6 @@ for vuln_dir in "$VULNS_DIR"/*; do
         # - Execute vulnerability-specific commands
         # - Generate reports
         for ((run=1; run<=NUM_RUNS; run++)); do
-
-            pkill -f ros2
 
             ./cleanup.sh
 
@@ -118,7 +118,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
                 kill $controllers $ros_node $voter $trajectory 2>/dev/null || true
                 wait $controllers $ros_node $voter $trajectory 2>/dev/null || true
 
-                pkill -f ros2
+                pkill -f ros
 
                 sleep 5
 
@@ -205,7 +205,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
             kill $controllers $ros_node $trajectory 2>/dev/null || true
             wait $controllers $ros_node $trajectory 2>/dev/null || true
 
-            pkill -f ros2
+            pkill -f ros
 
             echo "Trial result: $result_status"
 
