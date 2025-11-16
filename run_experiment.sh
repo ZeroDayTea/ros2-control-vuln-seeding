@@ -34,6 +34,17 @@ check_system_started() {
     return 1
 }
 
+cleanup() {
+    echo "Caught EXIT signal. Killing child processes..."
+    kill 0  # Kills all processes in the current process group
+    # Or: kill -- -$$ # Kills the process group leader and its children
+    wait # Wait for background processes to terminate
+    echo "Child processes terminated."
+}
+
+# Trap the EXIT signal to call the cleanup function
+trap cleanup EXIT
+
 
 # Iterate through each vulnerability directory
 for vuln_dir in "$VULNS_DIR"/*; do
@@ -106,8 +117,64 @@ for vuln_dir in "$VULNS_DIR"/*; do
                 continue  # Skip to next run
             fi
 
+            # THE EXPERIMENT IS RUNNING HERE *****
+            # Wait for voter to complete or timeout (100 seconds)
+            VOTER_TIMEOUT=100
+            start_time=$(date +%s)
+            result_status=""
 
-            sleep 100
+            echo "Waiting for voter to complete (timeout: ${VOTER_TIMEOUT}s)..."
+
+            while [ $(($(date +%s) - start_time)) -lt $VOTER_TIMEOUT ]; do
+                # Check if voter process is still running
+                if ! kill -0 $voter 2>/dev/null; then
+                    # Voter process has ended, get its exit code
+                    wait $voter
+                    voter_exit_code=$?
+                    
+                    if [ $voter_exit_code -eq 0 ]; then
+                        result_status="SUCCESS_REPAIR"
+                        echo "Trial completed: Voter detected bug and successfully repaired it"
+                    else
+                        result_status="DETECTED_NO_REPAIR"
+                        echo "Trial completed: Voter detected bug but failed to repair it (exit code: $voter_exit_code)"
+                    fi
+                    break
+                fi
+                sleep 1
+            done
+
+            # If we got here and result_status is empty, voter timed out
+            if [ -z "$result_status" ]; then
+                result_status="NO_DETECTION"
+                echo "Trial completed: Voter failed to detect bug (timed out after ${VOTER_TIMEOUT}s)"
+                # Kill the voter process since it timed out
+                kill $voter 2>/dev/null || true
+                wait $voter 2>/dev/null || true
+            fi
+
+            # Clean up all processes
+            echo "Cleaning up processes..."
+            kill $controllers $ros_node $trajectory 2>/dev/null || true
+            wait $controllers $ros_node $trajectory 2>/dev/null || true
+
+            echo "Trial result: $result_status"
+
+            # Copy Results based on result_status
+            case $result_status in
+                "SUCCESS_REPAIR")
+                    echo "TODO: Copy results for successful repair case"
+                    # Your result copying logic here
+                    ;;
+                "DETECTED_NO_REPAIR") 
+                    echo "TODO: Copy results for detected but failed repair case"
+                    # Your result copying logic here
+                    ;;
+                "NO_DETECTION")
+                    echo "TODO: Copy results for no detection case"
+                    # Your result copying logic here
+                    ;;
+            esac
             # Wait until it finishes??? - how?
 
             # Find the result of the detection/repair

@@ -150,7 +150,7 @@ def repair_controller(controller_index):
         print(f"Controller {controller_index} repaired and reactivated.")
 
         #subprocess.run("cp patches/0.diff patches_"+str(controller_index)+"/0.diff",shell=True, check=True)
-        #os._exit(0)
+        os._exit(0)
 
     else:
         # Handle cases where the script fails
