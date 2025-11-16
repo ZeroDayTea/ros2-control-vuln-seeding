@@ -82,7 +82,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
             ./controller.sh &
             controllers=$!
 
-            sleep 7
+            sleep 10
 
             echo "Starting Voter"
             python3 voter.py &
