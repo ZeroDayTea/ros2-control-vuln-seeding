@@ -70,7 +70,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
         for ((run=1; run<=NUM_RUNS; run++)); do
 
             pkill -f ros2
-            
+
             ./cleanup.sh
 
 
@@ -254,15 +254,15 @@ for vuln_dir in "$VULNS_DIR"/*; do
                         
                     fi
 
-                    echo ", $repair_succeeded, $repair_time\n" >> $LOG_FILE
+                    echo "$vuln_name, $run, $result_status, $repair_succeeded, $repair_time" >> $LOG_FILE
 
                     ;;
                 "DETECTED_NO_REPAIR") 
-                    echo ", 1, Repair Failed\n" >> $LOG_FILE
+                    echo "$vuln_name, $run, $result_status, 1, Repair Failed" >> $LOG_FILE
                     # Your result copying logic here
                     ;;
                 "NO_DETECTION")
-                    echo ", Undetected\n" >> $LOG_FILE
+                    echo "$vuln_name, $run, $result_status, Undetected" >> $LOG_FILE
                     # Your result copying logic here
                     ;;
             esac

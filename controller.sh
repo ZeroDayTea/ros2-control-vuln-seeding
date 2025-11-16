@@ -1,5 +1,16 @@
 #!/bin/bash
 
+cleanup() {
+    echo "Caught EXIT signal. Killing child processes..."
+    kill 0  # Kills all processes in the current process group
+    # Or: kill -- -$$ # Kills the process group leader and its children
+    wait # Wait for background processes to terminate
+    echo "Child processes terminated."
+}
+
+# Trap the EXIT signal to call the cleanup function
+trap cleanup EXIT
+
 echo "Starting r6bot_controller..."
 source /opt/ros/jazzy/setup.bash
 source install/setup.bash
