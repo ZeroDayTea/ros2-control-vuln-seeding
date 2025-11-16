@@ -132,7 +132,7 @@ def check_trust(current_trust_scores, threshold):
             active_controllers[i] = False
             print(f"sending controller {i} for fixing")
             # DEBUG
-            exit(1)
+            # exit(1)
             # make a thread to call for repair here on that controller path_to_controller_i
             thread = threading.Thread(target=repair_controller, args=(i,))
             thread.start()
