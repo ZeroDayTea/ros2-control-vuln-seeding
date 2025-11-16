@@ -145,7 +145,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
 
             # THE EXPERIMENT IS RUNNING HERE *****
             # Wait for voter to complete or timeout (100 seconds)
-            VOTER_TIMEOUT=100
+            VOTER_TIMEOUT=500
             start_time=$(date +%s)
             result_status=""
 
