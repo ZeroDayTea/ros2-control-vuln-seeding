@@ -160,6 +160,8 @@ for vuln_dir in "$VULNS_DIR"/*; do
             kill $controllers $ros_node $trajectory 2>/dev/null || true
             wait $controllers $ros_node $trajectory 2>/dev/null || true
 
+            pkill -f ros2
+
             echo "Trial result: $result_status"
 
             # Copy Results based on result_status
@@ -207,7 +209,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
                         
                     fi
 
-                    echo ", $repair_succeeded, $repair_time\n >> $LOGFILE"
+                    echo ", $repair_succeeded, $repair_time\n" >> $LOGFILE
 
                     ;;
                 "DETECTED_NO_REPAIR") 
