@@ -7,7 +7,7 @@
 
 # Script to automate vulnerability testing
 VULNS_DIR="vulns"
-NUM_RUNS=1
+NUM_RUNS=2
 LOG_FILE="repair_log.log"
 
 # Check if vulns directory exists
@@ -69,7 +69,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
         # - Run a specific test script
         # - Execute vulnerability-specific commands
         # - Generate reports
-        for ((run=1; run<NUM_RUNS; run++)); do
+        for ((run=1; run<=NUM_RUNS; run++)); do
             ./cleanup.sh
 
 
