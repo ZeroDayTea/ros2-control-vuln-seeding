@@ -90,7 +90,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
             ./send_trajectory.sh &
             trajectory=$!
 
-            sleep 5 # FIXME figure out how long this needs to be
+            sleep 8 # FIXME figure out how long this needs to be
 
             # Try to start the trajectory with retries
             MAX_START_RETRIES=5
