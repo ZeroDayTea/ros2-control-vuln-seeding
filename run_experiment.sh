@@ -100,7 +100,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
                 
                 # Check if system started properly
                 if check_system_started $START_CHECK_TIMEOUT; then
-                    $trajectory_started=true
+                    trajectory_started=true
                     break
                 else
                     echo "Trajectory not received, killing trajectory process and retrying..."
