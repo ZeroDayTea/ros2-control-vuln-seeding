@@ -108,18 +108,17 @@ for vuln_dir in "$VULNS_DIR"/*; do
                 # trajectory=$!
                 
 
-                # Clean up processes
-                kill 0
-                wait
-
                 # reset this run and try it again. The mission was not recieved by the ros_node
                 ((run--))
 
-                # echo "Cleaning up processes..."
-                # kill $controllers $ros_node $voter $trajectory 2>/dev/null || true
-                # wait $controllers $ros_node $voter $trajectory 2>/dev/null || true
+                echo "Cleaning up processes..."
+                kill $controllers $ros_node $voter $trajectory 2>/dev/null || true
+                wait $controllers $ros_node $voter $trajectory 2>/dev/null || true
 
-                # pkill -f ros2
+                pkill -f ros2
+
+                sleep 5
+
                 
                 continue  # Skip to next run
 
