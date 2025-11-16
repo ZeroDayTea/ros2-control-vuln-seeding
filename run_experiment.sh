@@ -8,6 +8,7 @@
 # Script to automate vulnerability testing
 VULNS_DIR="vulns"
 NUM_RUNS=10
+LOG_FILE="repair_log.log"
 
 # Check if vulns directory exists
 if [ ! -d "$VULNS_DIR" ]; then
@@ -45,6 +46,8 @@ cleanup() {
 # Trap the EXIT signal to call the cleanup function
 trap cleanup EXIT
 
+# Init Experiment Log
+echo "" > $LOG_FILE
 
 # Iterate through each vulnerability directory
 for vuln_dir in "$VULNS_DIR"/*; do
@@ -132,6 +135,8 @@ for vuln_dir in "$VULNS_DIR"/*; do
                     if [ $voter_exit_code -eq 0 ]; then
                         result_status="SUCCESS_REPAIR"
                         echo "Trial completed: Voter detected bug and successfully repaired it"
+
+
                     else
                         result_status="DETECTED_NO_REPAIR"
                         echo "Trial completed: Voter detected bug but failed to repair it (exit code: $voter_exit_code)"
@@ -158,25 +163,65 @@ for vuln_dir in "$VULNS_DIR"/*; do
             echo "Trial result: $result_status"
 
             # Copy Results based on result_status
+            echo "$vuln_name, $run, $result_status" >> $LOG_FILE
             case $result_status in
                 "SUCCESS_REPAIR")
-                    echo "TODO: Copy results for successful repair case"
-                    # Your result copying logic here
+                    echo "Parsing repair results from darjeeling log..."
+                    
+                    # Find the most recent darjeeling log file
+                    latest_log=$(ls -t darjeeling.log.* 2>/dev/null | head -n 1)
+                    
+                    if [ -z "$latest_log" ]; then
+                        echo "ERROR: No darjeeling log files found"
+                        repair_time="UNKNOWN"
+                        plausible_patches="UNKNOWN"
+                        repair_succeeded="UNKNOWN"
+                    else
+                        echo "Parsing log file: $latest_log"
+                        
+                        # Extract number of plausible patches
+                        plausible_patches=$(grep "found .* plausible patches" "$latest_log" | tail -n 1 | sed -n 's/.*found \([0-9]\+\) plausible patches.*/\1/p')
+                        
+                        # Extract time taken (in minutes)
+                        repair_time=$(grep "time taken:" "$latest_log" | tail -n 1 | sed -n 's/.*time taken: \([0-9.]\+\) minutes.*/\1/p')
+                        
+                        # Validate extraction
+                        if [ -z "$plausible_patches" ]; then
+                            echo "WARNING: Could not extract plausible patches count from log"
+                            plausible_patches="UNKNOWN"
+                            repair_succeeded="UNKNOWN"
+                        else
+                            # Determine if repair succeeded (non-zero plausible patches = success)
+                            if [ "$plausible_patches" -gt 0 ] 2>/dev/null; then
+                                repair_succeeded=1
+                            else
+                                repair_succeeded=0
+
+                            fi
+                        fi
+                        
+                        if [ -z "$repair_time" ]; then
+                            echo "WARNING: Could not extract repair time from log"
+                            repair_time="UNKNOWN"
+                        fi
+                        
+                    fi
+
+                    echo ", $repair_succeeded, $repair_time\n >> $LOGFILE"
+
                     ;;
                 "DETECTED_NO_REPAIR") 
-                    echo "TODO: Copy results for detected but failed repair case"
+                    echo ", Repair Failed\n" >> $LOG_FILE
                     # Your result copying logic here
                     ;;
                 "NO_DETECTION")
-                    echo "TODO: Copy results for no detection case"
+                    echo ", Undetected\n" >> $LOG_FILE
                     # Your result copying logic here
                     ;;
             esac
-            # Wait until it finishes??? - how?
 
-            # Find the result of the detection/repair
-
-            # Copy Results
+            # FIXME: TUNE THIS IF NECESARY
+            sleep 5
 
 
         done
