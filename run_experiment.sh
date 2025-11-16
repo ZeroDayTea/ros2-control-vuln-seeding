@@ -94,9 +94,6 @@ for vuln_dir in "$VULNS_DIR"/*; do
                 ./send_trajectory.sh &
                 trajectory=$!
                 
-                # Wait a bit for trajectory to be sent
-                sleep 5
-                
                 # Check if system started properly
                 if check_system_started $START_CHECK_TIMEOUT; then
                     trajectory_started=true
