@@ -8,7 +8,7 @@
 # Script to automate vulnerability testing
 VULNS_DIR="vulns"
 NUM_RUNS=2
-LOG_FILE="repair_log.log"
+LOG_FILE="experiment_log.log"
 
 # Check if vulns directory exists
 if [ ! -d "$VULNS_DIR" ]; then
@@ -83,7 +83,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
 
             sleep 5
 
-            python3 voter.py > voter_out.tmp &
+            python3 voter.py &
             voter=$!
 
             ./send_trajectory.sh &
