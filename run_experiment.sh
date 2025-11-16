@@ -7,7 +7,7 @@
 
 # Script to automate vulnerability testing
 VULNS_DIR="vulns"
-NUM_RUNS=2
+NUM_RUNS=10
 LOG_FILE="experiment_log.log"
 
 # Check if vulns directory exists
@@ -243,7 +243,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
                             if [ "$plausible_patches" -gt 0 ] 2>/dev/null; then
                                 repair_succeeded=1
 
-                                ls patches/ | cp "recorded_patches/$vuln_name-$run.patch"
+                                cp patches/0.diff recorded_patches/$vuln_name-$run.patch
                             else
                                 repair_succeeded=0
 
