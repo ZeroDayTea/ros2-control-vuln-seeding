@@ -49,6 +49,8 @@ trap cleanup EXIT
 # Init Experiment Log
 echo "" > $LOG_FILE
 
+pkill -f ros2
+
 # Iterate through each vulnerability directory
 for vuln_dir in "$VULNS_DIR"/*; do
     # Check if it's actually a directory
@@ -119,6 +121,12 @@ for vuln_dir in "$VULNS_DIR"/*; do
 
                 # reset this run and try it again. The mission was not recieved by the ros_node
                 ((run--))
+
+                echo "Cleaning up processes..."
+                kill $controllers $ros_node $trajectory 2>/dev/null || true
+                wait $controllers $ros_node $trajectory 2>/dev/null || true
+
+                pkill -f ros2
                 
                 continue  # Skip to next run
             fi
