@@ -47,8 +47,6 @@ trap cleanup EXIT
 # Init Experiment Log
 echo "" > $LOG_FILE
 
-pkill -f ros2
-
 # Iterate through each vulnerability directory
 for vuln_dir in "$VULNS_DIR"/*; do
     # Check if it's actually a directory
@@ -70,6 +68,9 @@ for vuln_dir in "$VULNS_DIR"/*; do
         # - Execute vulnerability-specific commands
         # - Generate reports
         for ((run=1; run<=NUM_RUNS; run++)); do
+
+            pkill -f ros2
+            
             ./cleanup.sh
 
 
