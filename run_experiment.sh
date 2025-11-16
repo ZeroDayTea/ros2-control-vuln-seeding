@@ -93,18 +93,35 @@ for vuln_dir in "$VULNS_DIR"/*; do
             sleep 8 # FIXME figure out how long this needs to be
 
             # Try to start the trajectory with retries
-            MAX_START_RETRIES=5
+            # MAX_START_RETRIES=5
             START_CHECK_TIMEOUT=5
-            trajectory_started=false
+            # trajectory_started=false
             if check_system_started $START_CHECK_TIMEOUT; then
-                trajectory_started=true
+                # trajectory_started=true
+                echo "system started"
             else
-                echo "Trajectory not received, killing trajectory process and retrying..."
-                kill $trajectory 2>/dev/null || true
-                wait $trajectory 2>/dev/null || true
-                sleep 1
-                ./send_trajectory.sh &
-                trajectory=$!
+                # echo "Trajectory not received, killing trajectory process and retrying..."
+                # kill $trajectory 2>/dev/null || true
+                # wait $trajectory 2>/dev/null || true
+                # sleep 1
+                # ./send_trajectory.sh &
+                # trajectory=$!
+                
+
+                # Clean up processes
+                kill 0
+                wait
+
+                # reset this run and try it again. The mission was not recieved by the ros_node
+                ((run--))
+
+                # echo "Cleaning up processes..."
+                # kill $controllers $ros_node $voter $trajectory 2>/dev/null || true
+                # wait $controllers $ros_node $voter $trajectory 2>/dev/null || true
+
+                # pkill -f ros2
+                
+                continue  # Skip to next run
 
             fi
             # for ((retry=1; retry<=MAX_START_RETRIES; retry++)); do
@@ -125,23 +142,23 @@ for vuln_dir in "$VULNS_DIR"/*; do
             #     fi
             # done
             
-            if [ "$trajectory_started" = false ]; then
-                echo "ERROR: Failed to start trajectory after $MAX_START_RETRIES attempts"
-                # Clean up processes
-                kill $voter $controllers $ros_node $trajectory 2>/dev/null || true
-                wait $voter $controllers $ros_node $trajectory 2>/dev/null || true
+            # if [ "$trajectory_started" = false ]; then
+            #     echo "ERROR: Failed to start trajectory after $MAX_START_RETRIES attempts"
+            #     # Clean up processes
+            #     kill $voter $controllers $ros_node $trajectory 2>/dev/null || true
+            #     wait $voter $controllers $ros_node $trajectory 2>/dev/null || true
 
-                # reset this run and try it again. The mission was not recieved by the ros_node
-                ((run--))
+            #     # reset this run and try it again. The mission was not recieved by the ros_node
+            #     ((run--))
 
-                echo "Cleaning up processes..."
-                kill $controllers $ros_node $voter $trajectory 2>/dev/null || true
-                wait $controllers $ros_node $voter $trajectory 2>/dev/null || true
+            #     echo "Cleaning up processes..."
+            #     kill $controllers $ros_node $voter $trajectory 2>/dev/null || true
+            #     wait $controllers $ros_node $voter $trajectory 2>/dev/null || true
 
-                pkill -f ros2
+            #     pkill -f ros2
                 
-                continue  # Skip to next run
-            fi
+            #     continue  # Skip to next run
+            # fi
 
             # THE EXPERIMENT IS RUNNING HERE *****
             # Wait for voter to complete or timeout (100 seconds)
