@@ -123,8 +123,8 @@ for vuln_dir in "$VULNS_DIR"/*; do
                 ((run--))
 
                 echo "Cleaning up processes..."
-                kill $controllers $ros_node $trajectory 2>/dev/null || true
-                wait $controllers $ros_node $trajectory 2>/dev/null || true
+                kill $controllers $ros_node $voter $trajectory 2>/dev/null || true
+                wait $controllers $ros_node $voter $trajectory 2>/dev/null || true
 
                 pkill -f ros2
                 
