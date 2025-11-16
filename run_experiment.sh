@@ -76,6 +76,8 @@ for vuln_dir in "$VULNS_DIR"/*; do
             ./start_controllers.sh &
             ros_node=$!
 
+            ros2 node list
+
             ./controller.sh &
             controllers=$!
 
