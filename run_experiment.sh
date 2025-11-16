@@ -98,9 +98,6 @@ for vuln_dir in "$VULNS_DIR"/*; do
             for ((retry=1; retry<=MAX_START_RETRIES; retry++)); do
                 echo "Attempting to send trajectory (attempt $retry/$MAX_START_RETRIES)"
                 
-                ./send_trajectory.sh &
-                trajectory=$!
-                
                 # Check if system started properly
                 if check_system_started $START_CHECK_TIMEOUT; then
                     $trajectory_started=true
@@ -110,6 +107,9 @@ for vuln_dir in "$VULNS_DIR"/*; do
                     kill $trajectory 2>/dev/null || true
                     wait $trajectory 2>/dev/null || true
                     sleep 1
+                    ./send_trajectory.sh &
+                    trajectory=$!
+
                 fi
             done
             
