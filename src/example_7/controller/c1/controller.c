@@ -29,6 +29,7 @@ void interpolate_point(
       point_interp->velocities[i] =
         delta * point_2.velocities[i] + (1.0 - delta) * point_1.velocities[i];
     }
+  
   }
   
   void interpolate_trajectory_point(
@@ -39,20 +40,12 @@ void interpolate_point(
     //auto last_time = traj_msg.points[traj_len - 1].time_from_start;
     double total_time = traj_msg.points[traj_len - 1].time_from_start_sec + traj_msg.points[traj_len - 1].time_from_start_nsec * 1E-9;
     //double total_time = last_time.sec + last_time.nanosec * 1E-9;
-
-        // Check if mission has ended
-    if (cur_time_seconds > total_time) {
-        // Keep final positions but zero velocities after mission completion
-        for (size_t i = 0; i < point_interp->velocities_length; i++) {
-            point_interp->velocities[i] = 0.0;
-        }
-        return;
-    }
   
     size_t ind = cur_time_seconds * (traj_len / total_time);
     ind = MIN( (double) ind, traj_len - 2);
     double delta = cur_time_seconds - ind * (total_time / traj_len);
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
+  
   }
 
 
@@ -61,6 +54,7 @@ int init() {
     in = malloc(sizeof(InStruct));
     out = malloc(sizeof(OutStruct));
     point_interp = malloc(sizeof(MappedJointTrajectoryPoint));
+
 }
 
 
@@ -76,4 +70,5 @@ int step() {
     printf("Did we vote? %f\n", point_interp->positions[0]);
 
     out->vote = *point_interp;
+
 }
