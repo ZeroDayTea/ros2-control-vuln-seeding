@@ -5,38 +5,38 @@ import os
 
 # LINE_LEN = 7
 REPAIR_PATH = "."
-MIN_IDX = 2
+MIN_IDX = 1
 NUM_PASS = 2
 NUM_FAIL = 2
 
-NUM_TESTS = 3
+NUM_TESTS = 4
 
 # pass in the controller number
 bad = sys.argv[1]
 
 max_idx = int(sys.argv[2])
 
-with open("missed_" + bad + ".txt") as missed:
-    miss_lines = missed.readlines()
-    miss = []
-    for x in miss_lines:
-        idx = int(x[:-1])
-        if idx >= MIN_IDX:
-            miss.append(idx)
+# with open("missed_" + bad + ".txt") as missed:
+#     miss_lines = missed.readlines()
+#     miss = []
+#     for x in miss_lines:
+#         idx = int(x[:-1])
+#         if idx >= MIN_IDX:
+#             miss.append(idx)
 
-    # miss = [x[:-1] for x in miss_lines]
-    print("controller missed: " + str(miss))
+#     # miss = [x[:-1] for x in miss_lines]
+#     print("controller missed: " + str(miss))
 
 
-if max_idx - MIN_IDX < NUM_TESTS:
-    print("ERROR: not enough recorded data")
-    # exit(1)
+# if max_idx - MIN_IDX < NUM_TESTS:
+#     print("ERROR: not enough recorded data")
+#     # exit(1)
 
-potential_passes = range(MIN_IDX, max_idx)
+# potential_passes = range(MIN_IDX, max_idx)
 
-passes = [x for x in potential_passes if x not in miss]
+# passes = [x for x in potential_passes if x not in miss]
 
-print(f"passes: {passes}")
+# print(f"passes: {passes}")
 
 
 # miss_cases = random.sample(miss, NUM_FAIL)
