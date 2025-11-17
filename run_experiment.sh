@@ -63,7 +63,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
         ./build_controllers.sh
         source ./source_workspace.sh
 
-        mkdir recorded_patches/$vuln_name
+        # mkdir recorded_patches/$vuln_name
         
         
         # Add your testing logic here
@@ -206,6 +206,8 @@ for vuln_dir in "$VULNS_DIR"/*; do
             echo "Cleaning up processes..."
             kill $controllers $ros_node $trajectory 2>/dev/null || true
             wait $controllers $ros_node $trajectory 2>/dev/null || true
+
+            pkill -f darjeeling
 
             pkill -f ros
 
