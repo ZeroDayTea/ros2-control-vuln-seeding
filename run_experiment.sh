@@ -169,6 +169,7 @@ for vuln_dir in "$VULNS_DIR"/*; do
             VOTER_TIMEOUT=500
             start_time=$(date +%s)
             result_status=""
+            voter_exit_code=0
 
             echo "Waiting for voter to complete (timeout: ${VOTER_TIMEOUT}s)..."
 
@@ -178,16 +179,19 @@ for vuln_dir in "$VULNS_DIR"/*; do
                     # Voter process has ended, get its exit code
                     wait $voter
                     voter_exit_code=$?
-                    
-                    if [ $voter_exit_code -eq 0 ]; then
-                        result_status="SUCCESS_REPAIR"
-                        echo "Trial completed: Voter detected bug and successfully repaired it"
-
-
-                    else
-                        result_status="DETECTED_NO_REPAIR"
-                        echo "Trial completed: Voter detected bug but failed to repair it (exit code: $voter_exit_code)"
+                    if [ "$voter_exit_code" -ne 0 ]; then
+                        echo "Wrong Controller Detected!!!"
                     fi
+                    result_status="DETECTED"
+                    # if [ $voter_exit_code -eq 0 ]; then
+                    #     result_status="SUCCESS_REPAIR"
+                    #     echo "Trial completed: Voter detected bug and successfully repaired it"
+
+
+                    # else
+                    #     result_status="DETECTED_NO_REPAIR"
+                    #     echo "Trial completed: Voter detected bug but failed to repair it (exit code: $voter_exit_code)"
+                    # fi
                     break
                 fi
                 sleep 1
@@ -213,11 +217,15 @@ for vuln_dir in "$VULNS_DIR"/*; do
 
             echo "Trial result: $result_status"
 
-            # Copy Results based on result_status
+
             case $result_status in
-                "SUCCESS_REPAIR")
-                    echo "Parsing repair results from darjeeling log..."
-                    
+                "DETECTED")
+                    echo "Controller detected - running repair..."
+                    # Get the number of recorded iterations that we have
+                    records=comm -12 <(ls results/state_* 2>/dev/null | sed 's/.*state_//' | sort -n) <(ls results/actuation_* 2>/dev/null | sed 's/.*actuation_//' | sort -n) | tail -1
+                    # Run the repair
+                    ./repair.sh 0 $records
+
                     # Find the most recent darjeeling log file
                     latest_log=$(ls -t darjeeling.log.* 2>/dev/null | head -n 1)
                     
@@ -259,13 +267,8 @@ for vuln_dir in "$VULNS_DIR"/*; do
                         
                     fi
 
-
                     echo "$vuln_name, $run, $result_status, $repair_succeeded, $repair_time" >> $LOG_FILE
 
-                    ;;
-                "DETECTED_NO_REPAIR") 
-                    echo "$vuln_name, $run, $result_status, 1, Repair Failed" >> $LOG_FILE
-                    # Your result copying logic here
                     ;;
                 "NO_DETECTION")
                     echo "$vuln_name, $run, $result_status, Undetected" >> $LOG_FILE
@@ -273,7 +276,70 @@ for vuln_dir in "$VULNS_DIR"/*; do
                     ;;
             esac
 
+
+            # # Copy Results based on result_status
+            # case $result_status in
+            #     "SUCCESS_REPAIR")
+            #         echo "Parsing repair results from darjeeling log..."
+                    
+            #         # Find the most recent darjeeling log file
+            #         latest_log=$(ls -t darjeeling.log.* 2>/dev/null | head -n 1)
+                    
+            #         if [ -z "$latest_log" ]; then
+            #             echo "ERROR: No darjeeling log files found"
+            #             repair_time="UNKNOWN"
+            #             plausible_patches="UNKNOWN"
+            #             repair_succeeded="UNKNOWN"
+            #         else
+            #             echo "Parsing log file: $latest_log"
+                        
+            #             # Extract number of plausible patches
+            #             plausible_patches=$(grep "found .* plausible patches" "$latest_log" | tail -n 1 | sed -n 's/.*found \([0-9]\+\) plausible patches.*/\1/p')
+                        
+            #             # Extract time taken (in minutes)
+            #             repair_time=$(grep "time taken:" "$latest_log" | tail -n 1 | sed -n 's/.*time taken: \([0-9.]\+\) minutes.*/\1/p')
+                        
+            #             # Validate extraction
+            #             if [ -z "$plausible_patches" ]; then
+            #                 echo "WARNING: Could not extract plausible patches count from log"
+            #                 plausible_patches="UNKNOWN"
+            #                 repair_succeeded="UNKNOWN"
+            #             else
+            #                 # Determine if repair succeeded (non-zero plausible patches = success)
+            #                 if [ "$plausible_patches" -gt 0 ] 2>/dev/null; then
+            #                     repair_succeeded=1
+
+            #                     cp patches/0.diff recorded_patches/$vuln_name-$run.patch
+            #                 else
+            #                     repair_succeeded=0
+
+            #                 fi
+            #             fi
+                        
+            #             if [ -z "$repair_time" ]; then
+            #                 echo "WARNING: Could not extract repair time from log"
+            #                 repair_time="UNKNOWN"
+            #             fi
+                        
+            #         fi
+
+
+            #         echo "$vuln_name, $run, $result_status, $repair_succeeded, $repair_time" >> $LOG_FILE
+
+            #         ;;
+            #     "DETECTED_NO_REPAIR") 
+            #         echo "$vuln_name, $run, $result_status, 1, Repair Failed" >> $LOG_FILE
+            #         # Your result copying logic here
+            #         ;;
+            #     "NO_DETECTION")
+            #         echo "$vuln_name, $run, $result_status, Undetected" >> $LOG_FILE
+            #         # Your result copying logic here
+            #         ;;
+            # esac
+
             # FIXME: TUNE THIS IF NECESARY
+
+            pkill -f darjeeling
             sleep 5
 
 
