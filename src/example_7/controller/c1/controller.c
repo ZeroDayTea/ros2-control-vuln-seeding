@@ -70,5 +70,6 @@ int step() {
     printf("Did we vote? %f\n", point_interp->positions[0]);
 
     out->vote = *point_interp;
+    return 0;
 
 }
