@@ -1,8 +1,12 @@
 #include "../controller.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
+
+
+double std_dev = 0.01;
 
 
 // InStruct in;
@@ -13,6 +17,35 @@ OutStruct *out;
 
 MappedJointTrajectoryPoint *point_interp;
 
+double
+randn (double mu, double sigma)
+{
+  double U1, U2, W, mult;
+  static double X1, X2;
+  static int call = 0;
+
+  if (call == 1)
+    {
+      call = !call;
+      return (mu + sigma * (double) X2);
+    }
+
+  do
+    {
+      U1 = -1 + ((double) rand () / RAND_MAX) * 2;
+      U2 = -1 + ((double) rand () / RAND_MAX) * 2;
+      W = pow (U1, 2) + pow (U2, 2);
+    }
+  while (W >= 1 || W == 0);
+
+  mult = sqrt ((-2 * log (W)) / W);
+  X1 = U1 * mult;
+  X2 = U2 * mult;
+
+  call = !call;
+
+  return (mu + sigma * (double) X1);
+}
 
 
 void interpolate_point(
@@ -22,12 +55,13 @@ void interpolate_point(
   {
     for (size_t i = 0; i < point_1.positions_length; i++)
     {
-      point_interp->positions[i] = delta * point_2.positions[i] + (1.0 - delta) * point_1.positions[i];
+      point_interp->positions[i] = 
+        randn(delta * point_2.positions[i] + (1.0 - delta) * point_1.positions[i], std_dev);
     }
     for (size_t i = 0; i < point_1.positions_length; i++)
     {
       point_interp->velocities[i] =
-        delta * point_2.velocities[i] + (1.0 - delta) * point_1.velocities[i];
+        randn(delta * point_2.velocities[i] + (1.0 - delta) * point_1.velocities[i], std_dev);
     }
   }
   
@@ -39,19 +73,11 @@ void interpolate_point(
     //auto last_time = traj_msg.points[traj_len - 1].time_from_start;
     double total_time = traj_msg.points[traj_len - 1].time_from_start_sec + traj_msg.points[traj_len - 1].time_from_start_nsec * 1E-9;
     //double total_time = last_time.sec + last_time.nanosec * 1E-9;
-
-        // Check if mission has ended
-    if (cur_time_seconds > total_time) {
-        // Keep final positions but zero velocities after mission completion
-        for (size_t i = 0; i < point_interp->velocities_length; i++) {
-            point_interp->velocities[i] = 0.0;
-        }
-        return;
-    }
   
     size_t ind = cur_time_seconds * (traj_len / total_time);
     ind = MIN( (double) ind, traj_len - 2);
     double delta = cur_time_seconds - ind * (total_time / traj_len);
+
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
   }
 
