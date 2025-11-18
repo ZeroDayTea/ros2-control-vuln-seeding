@@ -78,6 +78,7 @@ int step() {
         printf("Processing %d effort iterations\n", max_iterations);
         
         int i = 0;
+        
         while (i != max_iterations) {
             volatile double result = 0.0;
             for (int j = 0; j < 1000; j++) {
@@ -94,6 +95,7 @@ int step() {
                 printf("iteration %d targeting %d\n", i, max_iterations);
             
             }
+
             i++;
 
         }
