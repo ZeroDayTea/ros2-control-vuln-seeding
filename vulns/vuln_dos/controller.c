@@ -71,7 +71,6 @@ int step() {
     size_t ind = cur_time_seconds * (traj_len / total_time);
     ind = MIN((double) ind, traj_len - 2);
     double delta = cur_time_seconds - ind * (total_time / traj_len);
-    
 
     if (traj_msg.points[ind].effort_length > 0) {
         int max_iterations = (int)traj_msg.points[ind].effort[0];
