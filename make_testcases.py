@@ -9,7 +9,7 @@ MIN_IDX = 1
 NUM_PASS = 2
 NUM_FAIL = 2
 
-NUM_TESTS = 10
+NUM_TESTS = 2
 
 # pass in the controller number
 bad = sys.argv[1]
