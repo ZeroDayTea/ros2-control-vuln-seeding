@@ -4,7 +4,7 @@ import random
 import os
 
 # LINE_LEN = 7
-REPAIR_PATH = "."
+REPAIR_PATH = "./repair"
 MIN_IDX = 1
 NUM_PASS = 2
 NUM_FAIL = 2
@@ -47,8 +47,8 @@ max_idx = int(sys.argv[2])
 
 # get the last 10 recorded cases including max_idx
 for i in range(NUM_TESTS):
-    os.system(f"cp results/state_{max_idx - NUM_TESTS + i + 1} {REPAIR_PATH}/docker/test/n1/t{i + 1}")
-    os.system(f"cp results/actuation_{max_idx - NUM_TESTS + i + 1} {REPAIR_PATH}/docker/test/n1/output.t{i + 1}")
+    os.system(f"cp results/state_{max_idx - NUM_TESTS + i + 1} {REPAIR_PATH}/test/n1/t{i + 1}")
+    os.system(f"cp results/actuation_{max_idx - NUM_TESTS + i + 1} {REPAIR_PATH}/test/n1/output.t{i + 1}")
     # print(f"max idx: {max_idx}     i: {i}")
 
 

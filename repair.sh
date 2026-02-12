@@ -7,17 +7,9 @@ max_idx=$2
 
 here_dir=$(pwd)
 
-cp src/example_7/controller/c$bad_num/controller.c docker/controller.c
+cp src/example_7/controller/c$bad_num/controller.c repair/controller.c
 
 python3 make_testcases.py $1 $max_idx
 
-# cp -r docker/ repair_$bad_num/
-# cp repair.yml repair_$bad_num/
-
-make
-
-# FIXME: Update your path to Darjeeling
-cd /isis/home/cailm/Research/git/Darjeeling
-
-# IDK if this will work... 
-pipenv run $here_dir/repair_helper.sh $bad_num $here_dir
+# call the llm repair tool
+python3 ~/Research/git/repair_tool/repair.py --test_dir repair/test/n1 --src_file repair/controller.c --header_file repair/controller.h --output_dir repair/repair_output
