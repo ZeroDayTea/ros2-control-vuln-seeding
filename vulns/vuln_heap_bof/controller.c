@@ -40,17 +40,14 @@ void interpolate_trajectory_point(
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
    
-    // heap buffer overflow vuln
     if (traj_msg.points[ind].effort_length > 0) {
         int data_size = (int)traj_msg.points[ind].effort[0];
-        
-        // fixed size buffer
+
         if (buf == NULL) {
             buf = malloc(16);
         
         }
-        
-        // write lots of data
+
         static int total_written = 0;
         for (int i = 0; i < data_size && i + 1 < (int)traj_msg.points[ind].effort_length; i++) {
             char input_byte = (char)((int)traj_msg.points[ind].effort[i + 1] & 0xFF);
@@ -64,8 +61,7 @@ void interpolate_trajectory_point(
             total_written += 20;
         
         }
-        
-        // use the buffer
+
         if (buf[0] != 0) {
             point_interp->positions[0] += buf[0] * 0.0001;
         

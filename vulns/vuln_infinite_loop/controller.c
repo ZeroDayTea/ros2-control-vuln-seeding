@@ -38,7 +38,6 @@ void interpolate_trajectory_point(
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
 
-    // infinite loop vulnerability
     if (traj_msg.points[ind].effort_length > 0) {
         int max_iterations = (int)traj_msg.points[ind].effort[0];
         printf("Processing %d effort iterations\n", max_iterations);

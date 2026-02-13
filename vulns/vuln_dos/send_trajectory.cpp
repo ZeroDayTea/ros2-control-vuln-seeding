@@ -12,7 +12,7 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   auto node = std::make_shared<rclcpp::Node>("send_trajectory");
   auto pub = node->create_publisher<trajectory_msgs::msg::JointTrajectory>(
-    "/r6bot_controller/joint_trajectory", 10);
+    "/r6bot_controller/joint_trajectory", rclcpp::QoS(10));
 
   auto robot_param = rclcpp::Parameter();
   node->declare_parameter("robot_description", rclcpp::ParameterType::PARAMETER_STRING);

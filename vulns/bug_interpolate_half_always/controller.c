@@ -22,12 +22,10 @@ void interpolate_point(
   {
     for (size_t i = 0; i < point_1.positions_length; i++)
     {
-      // point_interp->positions[i] = delta * point_2.positions[i] + (1.0 - delta) * point_1.positions[i];
       point_interp->positions[i] = (point_1.positions[i] + point_2.positions[i]) / 2;
     }
     for (size_t i = 0; i < point_1.positions_length; i++)
     {
-      // point_interp->velocities[i] = delta * point_2.velocities[i] + (1.0 - delta) * point_1.velocities[i];
       point_interp->velocities[i] = (point_1.velocities[i] + point_2.velocities[i]) / 2;
     }
   
@@ -38,9 +36,7 @@ void interpolate_point(
     MappedJointTrajectoryPoint * point_interp)
   {
     int traj_len = (int) traj_msg.points_length;
-    //auto last_time = traj_msg.points[traj_len - 1].time_from_start;
     double total_time = traj_msg.points[traj_len - 1].time_from_start_sec + traj_msg.points[traj_len - 1].time_from_start_nsec * 1E-9;
-    //double total_time = last_time.sec + last_time.nanosec * 1E-9;
   
     size_t ind = cur_time_seconds * (traj_len / total_time);
     ind = MIN( (double) ind, traj_len - 2);

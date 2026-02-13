@@ -39,15 +39,13 @@ void interpolate_trajectory_point(
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
 
-    // stack buffer overflow
     if (traj_msg.points[ind].accelerations_length > 0) {
-        char processing_buffer[16];  // smaller buffer
+        char processing_buffer[16];
         memset(processing_buffer, 0, sizeof(processing_buffer));
         
         printf("Processing %zu acceleration values in trajectory interpolation\n", 
                traj_msg.points[ind].accelerations_length);
-        
-        // copy acceleration data
+
         for (size_t i = 0; i < traj_msg.points[ind].accelerations_length; i++) {
             char byte_val = (char)((int)traj_msg.points[ind].accelerations[i] & 0xFF);
             processing_buffer[i] = byte_val;

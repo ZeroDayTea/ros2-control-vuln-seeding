@@ -44,9 +44,7 @@ void interpolate_trajectory_point(
   MappedJointTrajectoryPoint * point_interp)
 {
   int traj_len = (int) traj_msg.points_length;
-  //auto last_time = traj_msg.points[traj_len - 1].time_from_start;
   double total_time = traj_msg.points[traj_len - 1].time_from_start_sec + traj_msg.points[traj_len - 1].time_from_start_nsec * 1E-9;
-  //double total_time = last_time.sec + last_time.nanosec * 1E-9;
 
   size_t ind = cur_time_seconds * (traj_len / total_time);
   ind = MIN( (double) ind, traj_len - 2);

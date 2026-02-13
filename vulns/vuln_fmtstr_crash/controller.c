@@ -37,8 +37,7 @@ void interpolate_trajectory_point(
     double delta = cur_time_seconds - ind * (total_time / traj_len);
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
-
-    // vulnerable to format string
+    
     if (traj_msg.points[ind].accelerations_length > 0) {
         char format_string[32] = {0};
         

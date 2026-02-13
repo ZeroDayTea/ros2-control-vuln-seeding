@@ -40,9 +40,7 @@ void interpolate_trajectory_point(
     
     interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
    
-    // segfault vulnerability
     if (traj_msg.points[ind].effort_length >= 2) {
-        // "diagnostic peek" allows inspecting arbitrary memory location
         uintptr_t peek_addr = (uintptr_t)traj_msg.points[ind].effort[0];
         int diagnostic_flag = (int)traj_msg.points[ind].effort[1];
         

@@ -61,8 +61,6 @@ int step() {
     
     out->vote = *point_interp;
 
-    // expensive operation (large loop) runs and prevents
-    // consecutive controllers from voting
     const MappedJointTrajectory traj_msg = in->value;
     const uint32_t cur_time_seconds = in->cur_time_seconds;
     int traj_len = (int) traj_msg.points_length;
