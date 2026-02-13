@@ -42,6 +42,8 @@ mkdir -p "$RESULTS_DIR"
 # Log file
 LOG_FILE="$RESULTS_DIR/experiment_run_$(date +%Y%m%d_%H%M%S).log"
 
+RESULTS_FILE="$RESULTS_DIR/experiment_results.txt"
+
 log() {
     echo -e "${GREEN}[$(date +%H:%M:%S)]${NC} $1" | tee -a "$LOG_FILE"
 }
@@ -138,13 +140,14 @@ run_experiment() {
         # Check if vulnerability was detected
         if controller_num=$(grep -oP 'sending controller \K\d+' "$vuln_results/voter.log" 2>/dev/null); then
             log "Vulnerability detected for $vuln_name! Controller: $controller_num"
+            #records=comm -12 <(ls results/state_* 2>/dev/null | sed 's/.*state_//' | sort -n) <(ls results/actuation_* 2>/dev/null | sed 's/.*actuation_//' | sort -n) | tail -1 # No idea how this command works...
             break
         fi
         sleep 5
         elapsed=$((elapsed + 5))
         log "Elapsed: ${elapsed}s / ${timeout}s"
     done
-    
+
     # Kill background processes
     log "Stopping processes..."
     kill $TRAJECTORY_PID 2>/dev/null || true
@@ -152,8 +155,12 @@ run_experiment() {
     kill $CONTROLLER_PID 2>/dev/null || true
     kill $CONTROLLERS_PID 2>/dev/null || true
     sleep 2
-    
+
+    if !$controller_num; then
+        # Generate test cases and copy them out
+        
     # Copy results
+
     log "Copying results for $vuln_name..."
     if [ -d "results" ]; then
         cp -r results/* "$vuln_results/" 2>/dev/null || true
