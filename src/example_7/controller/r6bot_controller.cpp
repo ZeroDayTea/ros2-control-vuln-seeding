@@ -122,7 +122,7 @@ controller_interface::CallbackReturn RobotController::on_configure(const rclcpp_
 
   joint_command_subscriber_ =
     get_node()->create_subscription<trajectory_msgs::msg::JointTrajectory>(
-      "/r6bot_controller/joint_trajectory", rclcpp::QoS(10).reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE), callback);
+      "/r6bot_controller/joint_trajectory", rclcpp::QoS(10), callback);
 
   return CallbackReturn::SUCCESS;
 }
