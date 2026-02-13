@@ -133,10 +133,11 @@ run_experiment() {
     log "Running experiment for $vuln_name..."
     local timeout=60
     local elapsed=0
+    controller_num=""
     while [ $elapsed -lt $timeout ]; do
         # Check if vulnerability was detected
-        if grep -q "VULNERABILITY DETECTED" "$vuln_results/voter.log" 2>/dev/null; then
-            log "Vulnerability detected for $vuln_name!"
+        if controller_num=$(grep -oP 'sending controller \K\d+' "$vuln_results/voter.log" 2>/dev/null); then
+            log "Vulnerability detected for $vuln_name! Controller: $controller_num"
             break
         fi
         sleep 5

@@ -16,7 +16,7 @@ echo "Controllers started. PIDs: $PID0 $PID1 $PID2"
 
 cleanup() {
   echo "Stopping controllers..."
-  kill $PID0 $PID1 $PID2
+  kill -9 $PID0 $PID1 $PID2
   wait $PID0 $PID1 $PID2
   echo "Controllers stopped"
 }
