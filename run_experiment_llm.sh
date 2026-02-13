@@ -155,12 +155,8 @@ run_experiment() {
     kill $CONTROLLER_PID 2>/dev/null || true
     kill $CONTROLLERS_PID 2>/dev/null || true
     sleep 2
-
-    if !$controller_num; then
-        # Generate test cases and copy them out
-        
-    # Copy results
-
+    
+    
     log "Copying results for $vuln_name..."
     if [ -d "results" ]; then
         cp -r results/* "$vuln_results/" 2>/dev/null || true
