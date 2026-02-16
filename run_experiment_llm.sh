@@ -110,7 +110,7 @@ run_experiment() {
     
     detected_controller_num=""
     while [ -z "$detected_controller_num" ]; do
-
+        cleanup
         # Start controllers in background
         log "Starting controllers..."
         ./start_controllers.sh > "$vuln_results/controllers.log" 2>&1 &
