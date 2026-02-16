@@ -23,6 +23,8 @@ for vuln in "${VULNERABILITIES[@]}"; do
     
     records=$(comm -12 <(ls repair/state_* 2>/dev/null | sed 's/.*state_//' | sort -n) <(ls repair/actuation_* 2>/dev/null | sed 's/.*actuation_//' | sort -n) | tail -1) # No idea how this command works...
     
+    ./copy_vuln.sh $vuln
+
     ./repair.sh 0 $records
 
     cp -r apr_output/ repairs/$vuln/
