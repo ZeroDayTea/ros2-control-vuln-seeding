@@ -25,13 +25,13 @@
 int main(int argc, char ** argv)
 {
 
-  auto qos = rclcpp::QoS(10);  // Start with depth of 10
-  qos.reliability(rclcpp::ReliabilityPolicy::Reliable);
-  
+  // auto qos = rclcpp::QoS(10);  // Start with depth of 10
+  // qos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+
   rclcpp::init(argc, argv);
   auto node = std::make_shared<rclcpp::Node>("send_trajectory");
   auto pub = node->create_publisher<trajectory_msgs::msg::JointTrajectory>(
-    "/r6bot_controller/joint_trajectory", qos);
+    "/r6bot_controller/joint_trajectory", rclcpp::SystemDefaultsQoS());
 
   // get robot description
   auto robot_param = rclcpp::Parameter();
