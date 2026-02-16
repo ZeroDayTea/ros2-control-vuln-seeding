@@ -19,7 +19,7 @@ for vuln in "${VULNERABILITIES[@]}"; do
     echo "REPAIRING $vuln"
     rm -r repair/
     mkdir repair/
-    cp -r experiment_results/$vuln/* repair/
+    cp experiment_results/$vuln/* repair/
     
     records=$(comm -12 <(ls repair/state_* 2>/dev/null | sed 's/.*state_//' | sort -n) <(ls repair/actuation_* 2>/dev/null | sed 's/.*actuation_//' | sort -n) | tail -1) # No idea how this command works...
     
