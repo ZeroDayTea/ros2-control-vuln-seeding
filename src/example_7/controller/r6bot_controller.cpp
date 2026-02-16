@@ -120,9 +120,12 @@ controller_interface::CallbackReturn RobotController::on_configure(const rclcpp_
     new_msg_ = true;
   };
 
+  auto qos = rclcpp::QoS(10);  // Start with depth of 10
+  qos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+
   joint_command_subscriber_ =
     get_node()->create_subscription<trajectory_msgs::msg::JointTrajectory>(
-      "/r6bot_controller/joint_trajectory", rclcpp::QoS(10), callback);
+      "/r6bot_controller/joint_trajectory", qos, callback);
 
   return CallbackReturn::SUCCESS;
 }

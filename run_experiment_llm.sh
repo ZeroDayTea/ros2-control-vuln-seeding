@@ -133,7 +133,7 @@ run_experiment() {
     
     # Wait for experiment to run (adjust timeout as needed)
     log "Running experiment for $vuln_name..."
-    local timeout=60
+    local timeout=30
     local elapsed=0
     controller_num=""
     while [ $elapsed -lt $timeout ]; do
