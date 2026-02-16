@@ -138,11 +138,10 @@ run_experiment() {
         log "Running experiment for $vuln_name..."
         local timeout=30
         local elapsed=0
-        controller_num=""
         while [ $elapsed -lt $timeout ]; do
             # Check if vulnerability was detected
-            if controller_num=$(grep -oP 'sending controller \K\d+' "$vuln_results/voter.log" 2>/dev/null); then
-                log "Vulnerability detected for $vuln_name! Controller: $controller_num"
+            if detected_controller_num=$(grep -oP 'sending controller \K\d+' "$vuln_results/voter.log" 2>/dev/null); then
+                log "Vulnerability detected for $vuln_name! Controller: $detected_controller_num"
                 #records=comm -12 <(ls results/state_* 2>/dev/null | sed 's/.*state_//' | sort -n) <(ls results/actuation_* 2>/dev/null | sed 's/.*actuation_//' | sort -n) | tail -1 # No idea how this command works...
                 break
             fi
