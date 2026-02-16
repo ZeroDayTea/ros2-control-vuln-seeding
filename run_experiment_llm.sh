@@ -161,6 +161,7 @@ run_experiment() {
     if [ -d "results" ]; then
         cp -r results/* "$vuln_results/" 2>/dev/null || true
     fi
+    cp missed_* "$vuln_results/" 2>/dev/null || true
     
     # Clean up
     cleanup
