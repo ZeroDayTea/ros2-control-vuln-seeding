@@ -46,6 +46,7 @@ max_idx = int(sys.argv[2])
 
 
 # get the last 10 recorded cases including max_idx
+os.system(f"mkdir {REPAIR_PATH}/test")
 os.system(f"mkdir {REPAIR_PATH}/test/n1")
 for i in range(NUM_TESTS):
     os.system(f"touch {REPAIR_PATH}/test/n1/t{i + 1}")
