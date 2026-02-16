@@ -32,7 +32,7 @@ VULNERABILITIES=(
     "vuln_heap_bof"
     "vuln_uaf"
     "vuln_fmtstr_crash"
-    "vuln_fmtstr_leak"
+    # "vuln_fmtstr_leak"
 )
 
 # Results directory
@@ -108,53 +108,58 @@ run_experiment() {
     log "Sourcing workspace..."
     source ./source_workspace.sh
     
-    # Start controllers in background
-    log "Starting controllers..."
-    ./start_controllers.sh > "$vuln_results/controllers.log" 2>&1 &
-    CONTROLLERS_PID=$!
-    sleep 5
-    
-    # Start controller.sh in background
-    log "Starting controller..."
-    ./controller.sh > "$vuln_results/controller.log" 2>&1 &
-    CONTROLLER_PID=$!
-    sleep 3
-    
-    # Start voter in background
-    log "Starting voter..."
-    python3 voter.py > "$vuln_results/voter.log" 2>&1 &
-    VOTER_PID=$!
-    sleep 3
-    
-    # Send trajectory
-    log "Sending trajectory..."
-    ./send_trajectory.sh > "$vuln_results/trajectory.log" 2>&1 &
-    TRAJECTORY_PID=$!
-    
-    # Wait for experiment to run (adjust timeout as needed)
-    log "Running experiment for $vuln_name..."
-    local timeout=30
-    local elapsed=0
-    controller_num=""
-    while [ $elapsed -lt $timeout ]; do
-        # Check if vulnerability was detected
-        if controller_num=$(grep -oP 'sending controller \K\d+' "$vuln_results/voter.log" 2>/dev/null); then
-            log "Vulnerability detected for $vuln_name! Controller: $controller_num"
-            #records=comm -12 <(ls results/state_* 2>/dev/null | sed 's/.*state_//' | sort -n) <(ls results/actuation_* 2>/dev/null | sed 's/.*actuation_//' | sort -n) | tail -1 # No idea how this command works...
-            break
-        fi
+    detected_controller_num=""
+    while [ -z "$detected_controller_num" ]; do
+
+        # Start controllers in background
+        log "Starting controllers..."
+        ./start_controllers.sh > "$vuln_results/controllers.log" 2>&1 &
+        CONTROLLERS_PID=$!
         sleep 5
-        elapsed=$((elapsed + 5))
-        log "Elapsed: ${elapsed}s / ${timeout}s"
+        
+        # Start controller.sh in background
+        log "Starting controller..."
+        ./controller.sh > "$vuln_results/controller.log" 2>&1 &
+        CONTROLLER_PID=$!
+        sleep 3
+        
+        # Start voter in background
+        log "Starting voter..."
+        python3 voter.py > "$vuln_results/voter.log" 2>&1 &
+        VOTER_PID=$!
+        sleep 3
+        
+        # Send trajectory
+        log "Sending trajectory..."
+        ./send_trajectory.sh > "$vuln_results/trajectory.log" 2>&1 &
+        TRAJECTORY_PID=$!
+        
+        # Wait for experiment to run (adjust timeout as needed)
+        log "Running experiment for $vuln_name..."
+        local timeout=30
+        local elapsed=0
+        controller_num=""
+        while [ $elapsed -lt $timeout ]; do
+            # Check if vulnerability was detected
+            if controller_num=$(grep -oP 'sending controller \K\d+' "$vuln_results/voter.log" 2>/dev/null); then
+                log "Vulnerability detected for $vuln_name! Controller: $controller_num"
+                #records=comm -12 <(ls results/state_* 2>/dev/null | sed 's/.*state_//' | sort -n) <(ls results/actuation_* 2>/dev/null | sed 's/.*actuation_//' | sort -n) | tail -1 # No idea how this command works...
+                break
+            fi
+            sleep 5
+            elapsed=$((elapsed + 5))
+            log "Elapsed: ${elapsed}s / ${timeout}s"
+        done
+
+        # Kill background processes
+        log "Stopping processes..."
+        kill $TRAJECTORY_PID 2>/dev/null || true
+        kill $VOTER_PID 2>/dev/null || true
+        kill $CONTROLLER_PID 2>/dev/null || true
+        kill $CONTROLLERS_PID 2>/dev/null || true
+        sleep 2
     done
 
-    # Kill background processes
-    log "Stopping processes..."
-    kill $TRAJECTORY_PID 2>/dev/null || true
-    kill $VOTER_PID 2>/dev/null || true
-    kill $CONTROLLER_PID 2>/dev/null || true
-    kill $CONTROLLERS_PID 2>/dev/null || true
-    sleep 2
     
     
     log "Copying results for $vuln_name..."
