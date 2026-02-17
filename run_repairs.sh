@@ -27,6 +27,6 @@ for vuln in "${VULNERABILITIES[@]}"; do
 
     ./repair.sh 0 $records
 
-    cp -r apr_output/ repairs/$vuln/
-    rm apr_ouput/*
+    cp -r ~/Research/git/claude_repair/apr_output/ repairs/$vuln/
+    rm ~/Research/git/claude_repair/apr_output/*
 done
