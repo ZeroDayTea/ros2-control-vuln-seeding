@@ -27,6 +27,6 @@ for vuln in "${VULNERABILITIES[@]}"; do
 
     ./repair.sh 0 $records
 
-    cp -r ~/Research/git/claude_repair/apr_output/ repairs/$vuln/
-    rm ~/Research/git/claude_repair/apr_output/*
+    cp -r ~/ros2_ws/src/ros2-control-vuln-seeding/repair/repair_output repairs/$vuln/
+    rm ~/ros2_ws/src/ros2-control-vuln-seeding/repair/repair_output
 done
