@@ -28,5 +28,5 @@ for vuln in "${VULNERABILITIES[@]}"; do
     ./repair.sh 0 $records
 
     cp -r ~/ros2_ws/src/ros2-control-vuln-seeding/repair/repair_output repairs/$vuln/
-    rm ~/ros2_ws/src/ros2-control-vuln-seeding/repair/repair_output
+    rm ~/ros2_ws/src/ros2-control-vuln-seeding/repair/repair_output/*
 done
